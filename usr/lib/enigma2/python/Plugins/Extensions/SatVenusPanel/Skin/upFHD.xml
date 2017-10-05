@@ -1,0 +1,18 @@
+	<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
+    <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />
+	<widget name="text" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" position="225,180" font="Rale;32" size="900,750" foregroundColor="#66ff00" transparent="1" zPosition="10" />	
+	
+	<widget name="key_red" position="257,877" size="150,45" zPosition="4"  foregroundColor="#cc0000" font="Rale;32" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
+	<widget name="key_yellow" position="410,877" size="150,45" zPosition="4" foregroundColor="#fff700" font="Rale;32" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />	
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="225,215" size="800,1" zPosition="10" alphatest="blend" /> 
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="225,260" size="800,1" zPosition="10" alphatest="blend" /> 
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="225,870" size="800,1" zPosition="10" alphatest="blend" /> 
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="225,920" size="800,1" zPosition="10" alphatest="blend" />
+
+<widget source="global.CurrentTime" render="Label" position="205,32" size="500,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="left">
+<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+</widget>
+<widget source="global.CurrentTime" render="Label" position="520,32" size="300,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="right">
+<convert type="ClockToText">Format:%-H:%M:%S</convert>
+</widget>
+</screen>	

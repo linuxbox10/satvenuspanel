@@ -1,0 +1,12 @@
+	<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
+    <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />	
+	
+	<widget name="text" font="Rale;27" position="225,180" size="1000,750" foregroundColor="#ffffff" transparent="1" zPosition="10" />	
+
+<widget source="global.CurrentTime" render="Label" position="205,32" size="500,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="left">
+<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+</widget>
+<widget source="global.CurrentTime" render="Label" position="520,32" size="300,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="right">
+<convert type="ClockToText">Format:%-H:%M:%S</convert>
+</widget>
+</screen>	

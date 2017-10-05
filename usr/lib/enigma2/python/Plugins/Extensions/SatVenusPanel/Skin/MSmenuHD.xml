@@ -1,0 +1,24 @@
+	<screen name="Menu" position="center,center" size="1280,720" flags="wfNoBorder"  backgroundColor="#40000000">
+    <ePixmap position="0,0" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2.png" alphatest="blend" transparent="1" />
+
+<widget source="list" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" render="Listbox" position="140,140" size="620,330" backgroundColorSelected="#40000000" foregroundColor="#bfff00" foregroundColorSelected="#cc0000" scrollbarMode="showOnDemand" transparent="1" >
+<convert type="TemplatedMultiContent">
+{"template": [
+MultiContentEntryPixmapAlphaTest(pos = (0, 0), size = (0, 0), png = 0),
+MultiContentEntryText(pos = (30, 0), size = (720, 80), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_TOP, text = 1),
+],
+"fonts": [gFont("Sansation-Bold", 42)],
+"itemHeight": 50
+}
+</convert>
+</widget>
+
+    <ePixmap position="140,300" size="595,360" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/mileHD.png" alphatest="blend" transparent="1" />
+<eLabel text="Please select ..." position="140,670" size="1280,130" noWrap="1" transparent="1" font="Rale;26" foregroundColor="#ffffff" />			
+<widget source="global.CurrentTime" render="Label" position="150,20" size="400,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;23" halign="left">
+<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+</widget>
+<widget source="global.CurrentTime" render="Label" position="300,20" size="250,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;23" halign="right">
+<convert type="ClockToText">Format:%-H:%M:%S</convert>
+</widget>
+</screen>

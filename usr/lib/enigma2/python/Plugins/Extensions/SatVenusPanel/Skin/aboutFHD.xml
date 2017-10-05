@@ -1,0 +1,19 @@
+	<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
+    <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />		
+    <eLabel text="SatVenus Panel FullHD 6.5.1" position="170,370" size="1000,85" noWrap="1" transparent="1" font="Days;76" foregroundColor="#faf0be" valign="center" halign="center" zPosition="6" />
+	<eLabel text="Addon's for your image!" position="220,455" size="900,78" noWrap="1" transparent="1" font="Cap2;65" foregroundColor="#ffffff" valign="center" halign="center" zPosition="6" />
+	<eLabel text="www.satvenus.com" position="220,535" size="900,78" noWrap="1" transparent="1" font="Rale;65" foregroundColor="#cc0000" valign="center" halign="center" zPosition="6" />
+	<eLabel text="Board The Best" position="220,615" size="900,77" noWrap="1" transparent="1" font="Days;64" foregroundColor="#ffffff" valign="center" halign="center" zPosition="6" />
+	<eLabel text="2008 - 2017" position="220,695" size="900,76" noWrap="1" transparent="1" font="Cap2;63" foregroundColor="#00ff00" valign="center" halign="center" zPosition="6" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="270,250" size="800,1" zPosition="10" alphatest="blend" /> 
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="270,310" size="800,1" zPosition="10" alphatest="blend" />
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="270,850" size="800,1" zPosition="10" alphatest="blend" /> 
+	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="270,910" size="800,1" zPosition="10" alphatest="blend" />
+
+<widget source="global.CurrentTime" render="Label" position="205,32" size="500,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="left">
+<convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
+</widget>
+<widget source="global.CurrentTime" render="Label" position="520,32" size="300,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="right">
+<convert type="ClockToText">Format:%-H:%M:%S</convert>
+</widget>
+</screen>	

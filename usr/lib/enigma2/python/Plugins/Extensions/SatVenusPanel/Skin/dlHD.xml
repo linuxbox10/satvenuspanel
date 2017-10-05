@@ -1,0 +1,6 @@
+	<screen name="Menu" position="center,center" size="1280,720" flags="wfNoBorder"  backgroundColor="#40000000">	
+    <ePixmap position="0,0" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2.png" alphatest="blend" transparent="1" />
+	<widget name="info" position="140,670" size="595,40" backgroundColor="#40000000" foregroundColor="#fff700" font="Rale;30" transparent="1" zPosition="5"/>
+	<widget name="progress" position="140,400" size="595,60" transparent="1" borderWidth="1" zPosition="4"/>
+	<widget name="info2" position="140,180" size="720,300" backgroundColor="#40000000" foregroundColor="#ffffff" font="Rale;26" transparent="1" zPosition="6" />
+	</screen>
