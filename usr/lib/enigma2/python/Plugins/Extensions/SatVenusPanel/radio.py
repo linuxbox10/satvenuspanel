@@ -84,7 +84,6 @@ class AmenuList(MenuList):
             self.l.setItemHeight(72)
             self.l.setFont(0, gFont('Days', 70))
 
-
 def AmenuListEntry(name, idx):
     res = [name]
     if idx == 0:
@@ -104,7 +103,7 @@ def AmenuListEntry(name, idx):
     elif idx == 7:
         png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/icons/rock.png'
     if fileExists(png):
-        res.append(MultiContentEntryPixmapAlphaTest(pos=(0, 0), size=(40, 40), png=loadPNG(png)))
+        res.append(MultiContentEntryPixmapAlphaTest(pos=(0, 10), size=(40, 40), png=loadPNG(png)))
     res.append(MultiContentEntryText(pos=(50, 10), size=(1000, 320), font=0, text=name))
     return res
 
@@ -317,9 +316,9 @@ class SaleScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/rock'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -398,9 +397,9 @@ class IntScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/inter'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -479,9 +478,9 @@ class CroScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/hrvatska'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -560,9 +559,9 @@ class BosScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/bosna'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -640,9 +639,9 @@ class SloScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/slovenija'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -720,9 +719,9 @@ class MacScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/makedonija'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -800,9 +799,9 @@ class MonScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/crnagora'
         xmlparse = xml.dom.minidom.parse(myfile)
@@ -880,9 +879,9 @@ class SerScreen(Screen):
         self.session.nav.stopService()
         self.onClose.append(self.__onClose)
         list = []
-        self['ButtonGreen'] = Pixmap()
+#        self['ButtonGreen'] = Pixmap()
         self['ButtonGreentext'] = Label(_('Play'))
-        self['ButtonRed'] = Pixmap()
+#        self['ButtonRed'] = Pixmap()
         self['ButtonRedtext'] = Label(_('Exit'))
         myfile = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/xml/srbija'
         xmlparse = xml.dom.minidom.parse(myfile)

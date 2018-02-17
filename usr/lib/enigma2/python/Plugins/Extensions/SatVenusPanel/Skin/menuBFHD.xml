@@ -1,7 +1,7 @@
 	<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
     <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />	
 	
-	<widget name="text" position="200,180" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" backgroundColorSelected="#40000000" size="1100,900" foregroundColor="#faf0be" foregroundColorSelected="#cc0000" scrollbarMode="showNever" transparent="1" zPosition="10" />
+	<widget name="text" position="200,180" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" backgroundColorSelected="#40000000" size="1100,1000" foregroundColor="#faf0be" foregroundColorSelected="#cc0000" scrollbarMode="showNever" transparent="1" zPosition="10" />
 	<eLabel text="Please select ..." position="200,1005" size="1280,130" noWrap="1" transparent="1" font="Rale;36" foregroundColor="#ffffff" />	
 <widget source="global.CurrentTime" render="Label" position="205,32" size="500,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="left">
 <convert type="ClockToText">Format:%A, %d.%m.%Y</convert>

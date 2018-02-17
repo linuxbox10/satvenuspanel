@@ -1,9 +1,13 @@
 	<screen name="Menu" position="center,center" size="1280,720" flags="wfNoBorder"  backgroundColor="#40000000">	
     <ePixmap position="0,0" size="1280,720" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2.png" alphatest="blend" transparent="1" />	
 
-	<widget name="text" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" position="140,130" size="800,560" font="Rale;24" foregroundColor="#66ff00" transparent="1" zPosition="2" />
-	<widget name="key_red" position="247,527" size="150,45" zPosition="4"  foregroundColor="#cc0000" font="Rale;24" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />
-	<widget name="key_yellow" position="373,527" size="150,45" zPosition="4" foregroundColor="#fff700" font="Rale;24" transparent="1" shadowColor="#25062748" shadowOffset="-2,-2" />	
+<widget name="text" position="140,130" size="800,560" font="Rale;24" foregroundColor="#66ff00" transparent="1" zPosition="2" />
+	
+<ePixmap position="225,535" size="10,25" zPosition="0" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/red.png" transparent="1" alphatest="on"/>
+<widget name="key_red" position="170,538" size="200,25" transparent="1" font="Regular;20"/>
+<ePixmap position="440,535" size="10,25" zPosition="0" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/yellow.png" transparent="1" alphatest="on"/>
+<widget name="key_yellow" position="400,538" size="200,25" transparent="1" font="Regular;20"/>
+
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/line.png" position="115,190" size="600,1" zPosition="10" alphatest="blend" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/line.png" position="115,492" size="600,1" zPosition="10" alphatest="blend" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/line.png" position="115,529" size="600,1" zPosition="10" alphatest="blend" />

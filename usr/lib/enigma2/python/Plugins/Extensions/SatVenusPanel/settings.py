@@ -14,8 +14,8 @@ from Components.Harddisk import harddiskmanager
 from Components.PluginComponent import plugins
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Plugins.Plugin import PluginDescriptor
-from SettingsList import SettingsList
-from SettingsList import ScreenBox
+from SettingsList import SettingsList, ActionBox
+from image_viewer import ScreenBox
 from Screens.MessageBox import MessageBox
 import os
 import shutil
@@ -81,6 +81,8 @@ class Settings_Menu(Screen):
         self.drawList.append(self.buildListEntry(_('</ Vhannibal Settings >'), 'downloads.png'))
         self.drawList.append(self.buildListEntry(_('</ HDSC Settings >'), 'downloads.png'))
         self.drawList.append(self.buildListEntry(_('</ Bi58 Settings >'), 'downloads.png'))
+        self.drawList.append(self.buildListEntry(_('</ Chveneburi  >'), 'downloads.png'))
+        self.drawList.append(self.buildListEntry(_('</ jprekpa2 >'), 'downloads.png'))		
         self['list'].setList(self.drawList)
 
     def openSelected(self):
@@ -101,10 +103,104 @@ class Settings_Menu(Screen):
             HDSCHelper(self.session).load()
         elif index == 7:
             Bi58Helper(self.session).load()
+        elif index == 8:
+            ChveneburiHelper(self.session).load()
+        elif index == 9:
+            jprekpa2Helper(self.session).load()			
 
     def quit(self):
         self.close()
 
+Chveneburi_HOST = '178.63.156.75'
+Chveneburi_PATH = '/paneladdons/Chveneburi/'
+
+class ChveneburiHelper(Screen):
+
+    def __init__(self, session):
+        self.session = session
+
+    def download(self):
+        self.loaded = True
+        self.list = []
+        try:
+            conn = httplib.HTTPConnection(Chveneburi_HOST)
+            conn.request('GET',Chveneburi_PATH + 'Chveneburi.xml')
+            httpres = conn.getresponse()
+            if httpres.status == 200:
+                mdom = xml.etree.cElementTree.parse(httpres)
+                root = mdom.getroot()
+                for node in root:
+                    if node.tag == 'package':
+                        sat = node.text
+                        date = node.get('date')
+                        print date[:4]
+                        print date[4:6]
+                        print date[-2:]
+                        date = datetime.date(int(date[:4]), int(date[4:6]), int(date[-2:]))
+                        date = date.strftime('%d %b')
+                        url = 'http://' + Chveneburi_HOST +Chveneburi_PATH + node.get('filename')
+                        self.list.append([sat, date, url])
+
+            else:
+                self.session.open(ScreenBox, _('Cannot download Chveneburi list'), ScreenBox.TYPE_ERROR, timeout=2)
+                self.loaded = False
+        except Exception as e:
+            print e
+            self.session.open(ScreenBox, _('Cannot download Chveneburi list'), ScreenBox.TYPE_ERROR, timeout=2)
+            self.loaded = False
+
+    def load(self):
+        self.session.openWithCallback(self.show, ActionBox, _('Downloading Chveneburi list'), _('Downloading ...'), self.download)
+
+    def show(self, ret = None):
+        if self.loaded:
+            self.session.open(Satvenus, self.list)
+
+jprekpa2_HOST = '178.63.156.75'
+jprekpa2_PATH = '/paneladdons/jprekpa2/'
+
+class jprekpa2Helper(Screen):
+
+    def __init__(self, session):
+        self.session = session
+
+    def download(self):
+        self.loaded = True
+        self.list = []
+        try:
+            conn = httplib.HTTPConnection(jprekpa2_HOST)
+            conn.request('GET', jprekpa2_PATH + 'jprekpa2.xml')
+            httpres = conn.getresponse()
+            if httpres.status == 200:
+                mdom = xml.etree.cElementTree.parse(httpres)
+                root = mdom.getroot()
+                for node in root:
+                    if node.tag == 'package':
+                        sat = node.text
+                        date = node.get('date')
+                        print date[:4]
+                        print date[4:6]
+                        print date[-2:]
+                        date = datetime.date(int(date[:4]), int(date[4:6]), int(date[-2:]))
+                        date = date.strftime('%d %b')
+                        url = 'http://' + jprekpa2_HOST + jprekpa2_PATH + node.get('filename')
+                        self.list.append([sat, date, url])
+
+            else:
+                self.session.open(ScreenBox, _('Cannot download jprekpa2 list'), ScreenBox.TYPE_ERROR, timeout=2)
+                self.loaded = False
+        except Exception as e:
+            print e
+            self.session.open(ScreenBox, _('Cannot download jprekpa2 list'), ScreenBox.TYPE_ERROR, timeout=2)
+            self.loaded = False
+
+    def load(self):
+        self.session.openWithCallback(self.show, ActionBox, _('Downloading jprekpa2 list'), _('Downloading ...'), self.download)
+
+    def show(self, ret = None):
+        if self.loaded:
+            self.session.open(Satvenus, self.list)		
+		
 
 Bi58_HOST = '178.63.156.75'
 Bi58_PATH = '/paneladdons/Bi58/'
@@ -532,36 +628,4 @@ class Satvenus(SettingsList):
         f = open(skin, 'r')
         self.skin = f.read()
         f.close()
-
-
-class ActionBox(Screen):
-
-    def __init__(self, session, message, title, action):
-        self.session = session
-        if DESKHEIGHT < 1000:
-            skin = skin_path + 'akcionHD.xml'
-        else:
-            skin = skin_path + 'akcionFHD.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
-        f.close()
-        Screen.__init__(self, session)
-        self.ctitle = title
-        self.caction = action
-        self['message'] = Label(message)
-        self['logo'] = Pixmap()
-        self.timer = eTimer()
-        self.timer.callback.append(self.__setTitle)
-        self.timer.start(200, 1)
-
-    def __setTitle(self):
-        if self['logo'].instance is not None:
-            self['logo'].instance.setPixmapFromFile(os.path.dirname(sys.modules[__name__].__file__) + '/images/run.png')
-        self.setTitle(self.ctitle)
-        self.timer = eTimer()
-        self.timer.callback.append(self.__start)
-        self.timer.start(200, 1)
-        return
-
-    def __start(self):
-        self.close(self.caction())
+		

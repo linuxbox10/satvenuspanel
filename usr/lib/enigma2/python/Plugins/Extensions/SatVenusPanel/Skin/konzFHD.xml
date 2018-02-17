@@ -2,6 +2,7 @@
     <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />	
 	
 	<widget name="text" position="225,180" font="Rale;26" size="1000,750" foregroundColor="#fff700" transparent="1" zPosition="10" />
+
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="225,175" size="800,1" zPosition="10" alphatest="blend" /> 	
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="225,210" size="800,1" zPosition="10" alphatest="blend" />
 

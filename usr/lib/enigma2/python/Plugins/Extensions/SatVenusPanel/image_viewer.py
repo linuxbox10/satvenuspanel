@@ -1,4 +1,4 @@
-# Embedded file name: /usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/dmimages.py
+# Embedded file name: /usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/vuimages.py
 from Plugins.Plugin import PluginDescriptor
 from Screens.Console import Console
 from Screens.ChoiceBox import ChoiceBox
@@ -28,7 +28,6 @@ from Components.ConfigList import ConfigListScreen
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.SelectionList import SelectionList
 from Components.PluginComponent import plugins
-from Components.AVSwitch import AVSwitch
 from twisted.web.client import downloadPage, getPage
 from socket import gethostbyname
 from xml.dom.minidom import parse, getDOMImplementation
@@ -46,28 +45,18 @@ import datetime
 import urllib2
 import gettext
 import os
-from dmdata import getdata, getplidata, nfizip, getgz
+from image_downloader import process_mode
 config.plugins.ImageDownLoader2 = ConfigSubsection()
-config.plugins.ImageDownLoader2.addstr = ConfigText(default='tsimage')
-config.plugins.ImageDownLoader2.Downloadlocation = ConfigText(default='/media/usb/', visible_width=50, fixed_size=False)
-config.plugins.ImageDownLoader2.log = ConfigText(default='2> /tmp/ImageDownLoaderLog >&1')
-config.plugins.ImageDownLoader2.debug = ConfigText(default='debugon')
-config.plugins.ImageDownLoader2.swap = ConfigSelection([('auto', 'auto'),
- ('128', '128 MB'),
- ('256', '256 MB'),
- ('512', '512 MB'),
- ('0', 'off')], default='auto')
-config.plugins.ImageDownLoader2.swapsize = ConfigText(default='128')
-config.plugins.ImageDownLoader2.disclaimer = ConfigBoolean(default=True)
-config.plugins.ImageDownLoader2.update = ConfigYesNo(default=False)
-mounted_string = 'Nothing mounted at '
+config.plugins.ImageDownLoader2.Downloadlocation = ConfigText(default='/media/', visible_width=50, fixed_size=False)
 dwidth = getDesktop(0).size().width()
-currversion = 'oe2.0'
+currversion = 'eo2.0'
 mountedDevs = []
 for p in harddiskmanager.getMountedPartitions(True):
     mountedDevs.append((p.mountpoint, _(p.description) if p.description else ''))
 
 mounted_string = 'Nothing mounted at '
+
+p_path = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel'
 
 def getDownloadPath():
     Downloadpath = config.plugins.ImageDownLoader2.Downloadlocation.value
@@ -75,7 +64,6 @@ def getDownloadPath():
         return Downloadpath
     else:
         return Downloadpath + '/'
-
 
 def freespace():
     downloadlocation = getDownloadPath()
@@ -89,16 +77,8 @@ def freespace():
         return fspace
     except:
         return 0
-
-
-def _(txt):
-    t = gettext.dgettext('ImageDownLoader', txt)
-    if t == txt:
-        t = gettext.gettext(txt)
-    return t
-
-
-class dmFeeds(Screen):
+		
+class Feeds(Screen):
 
     def __init__(self, session):
         self.session = session
@@ -110,43 +90,8 @@ class dmFeeds(Screen):
         self.skin = f.read()
         f.close()
         Screen.__init__(self, session)
-        self.serversnames = []
-        self.serversurls = []
         self['ButtonRedtext'] = Label(_('Exit'))
         self['ButtonGreentext'] = Label(_('Please select ...'))
-        if currversion == 'oe2.0':
-            self.serversnames = ['SatDreamGr',
-             'OpenATV',
-             'OpenDroid',
-             'OpenESI',
-             'OpenPLi',
-             'OpenLD',
-             'NewNigma2',
-             'Dream Elite',
-             'Original Images 2.0',
-             'D.M.S.',
-             'OpenHDFreaks',
-             'TSimage',
-             'PBnigma',
-             'OoZooN',
-             'Merlin3',
-             'PowerSat']
-            self.serversurls = ['http://sgcpm.com/satdreamgr-images/dreambox/',
-             'http://images.mynonpublic.com/openatv/6.1/index.php?open=',
-             'http://images.opendroid.org/6.4/Dreambox/index.php?dir=',
-             'http://www.openesi.eu/images/images/index.php?dir=Dreambox/',
-             'http://178.63.156.75/DreamBoxImages/OpenPLi/',
-             'http://www.odisealinux.com/',
-             'http://feed.newnigma2.to/daily/',
-             'http://images.dream-elite.net/DE4/index.php?dir=',
-             'http://dreamboxupdate.com/opendreambox/2.0.0/images/',
-             'http://www.demonisat.info/demonisat-e2Img-OE2.0/',
-             'http://v62.hdfreaks.cc/',
-             'http://tunisia-dreambox.info/tsimage-feed/unstable/3.0/images/',
-             'http://178.63.156.75/DreamBoxImages/PBnigma/',
-             'http://oozoon-download.de/opendreambox/images/',
-             'http://feed.merlin3.info/',
-             'http://www.power-sat.org/power-plus/index.php?dir=Powersat_2.0/']
         self.list = []
         self['text'] = MenuList([], True, eListboxPythonMultiContent)
         self.addon = 'emu'
@@ -157,54 +102,45 @@ class dmFeeds(Screen):
          'green': self.okClicked,
          'cancel': self.close}, -2)
         self.ListToMulticontent()
-
+		
     def ListToMulticontent(self):
         res = []
         theevents = []
-        self.events = []
-        self.events = self.serversnames
+        self.data=process_mode(None)		
         if dwidth == 1280:
             self['text'].l.setItemHeight(34)
-            self['text'].l.setFont(0, gFont('Rale', 24))
-            for i in range(0, len(self.events)):
+            self['text'].l.setFont(0, gFont('Sansation-Bold', 28))
+            for i in range(0, len(self.data)):	
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 35), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryText(pos=(30, 2), size=(720, 35), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
+                res.append(MultiContentEntryText(pos=(30, 5), size=(720, 35), font=0, flags=RT_HALIGN_LEFT, text=str(self.data[i][0])))
                 theevents.append(res)
                 res = []
 
         else:
             self['text'].l.setItemHeight(50)
-            self['text'].l.setFont(0, gFont('Rale', 40))
-            for i in range(0, len(self.events)):
+            self['text'].l.setFont(0, gFont('Sansation-Bold', 40))
+            for i in range(0, len(self.data)):			
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 50), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryText(pos=(30, 2), size=(720, 50), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(720, 50), font=0, flags=RT_HALIGN_LEFT, text=str(self.data[i][0])))
                 theevents.append(res)
                 res = []
 
         self['text'].l.setList(theevents)
         self['text'].show()
 
-    def greenclick(self):
-        self.session.open(SelectDownloadLocation)
-
-    def blueclick(self):
-        self.session.open(DownloadedFiles)
-
     def okClicked(self):
         selectedserverurl = ''
         try:
             selection = self['text'].getCurrent()
             cindex = self['text'].getSelectionIndex()
-            selectedservername = self.serversnames[cindex]
-            selectedserverurl = self.serversurls[cindex]
-            self.session.open(Servers, selectedservername, selectedserverurl)
+            param=self.data[cindex][1]
+            self.session.open(Servers,param)
         except:
             pass
 
-
 class Servers(Screen):
 
-    def __init__(self, session, selectedservername = None, selectedserverurl = None):
+    def __init__(self, session,param=None):
         self.session = session
         if dwidth == 1280:
             skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/serversHD.xml'
@@ -214,142 +150,14 @@ class Servers(Screen):
         self.skin = f.read()
         f.close()
         Screen.__init__(self, session)
-        self.selectedservername = selectedservername
-        self.rooturl = selectedserverurl
         self['ButtonRedtext'] = Label(_('Exit'))
         self['ButtonGreentext'] = Label(_('Please select ...'))
-        self.newsurl = ''
         self.list = []
         self['list'] = MenuList([], True, eListboxPythonMultiContent)
         self.addon = 'emu'
         self.icount = 0
-        self.searchstr = None
         self.downloading = False
-        self.data = []
-        if self.selectedservername == 'NewNigma2':
-            self.groups = ['images']
-            self.downloading = True
-        if self.selectedservername == 'Dream Elite':
-            self.groups = ['DM500HD',
-             'DM500HDv2',
-             'DM800SE',
-             'DM800SEv2',
-             'DM7020HD',
-             'DM7020HDv2',
-             'DM8000']
-            self.downloading = True
-        if self.selectedservername == 'PowerSat':
-            self.groups = ['Immagini_OE_2.0_powersat']
-            self.downloading = True
-        if self.selectedservername == 'PBnigma':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'OpenLD':
-            self.groups = ['DreamBox.html']
-            self.downloading = True
-        if self.selectedservername == 'Original Images 2.0':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'OpenATV':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'D.M.S.':
-            self.groups = ['DM%20500%20HD',
-             'DM%20500HDv2',
-             'DM%20800%20HD',
-             'DM%20800se%20HD',
-             'DM%20800sev2%20HD',
-             'DM%207020%20HD',
-             'DM%207020HDv2',
-             'DM%208000%20HD']
-            self.downloading = True
-        if self.selectedservername == 'OpenHDFreaks':
-            self.groups = ['dm7020hd', 'dm7020hdv1']
-            self.downloading = True
-        if self.selectedservername == 'TSimage':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'SatDreamGr':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'SatDreamGr Experimental':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'OpenDroid':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'OpenESI':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'Merlin3':
-            self.groups = ['images']
-            self.downloading = True
-        if self.selectedservername == 'OoZooN':
-            self.groups = ['dm500hd',
-             'dm500hdv2',
-             'dm800',
-             'dm800se',
-             'dm800sev2',
-             'dm7020hd',
-             'dm7020hdv2',
-             'dm8000']
-            self.downloading = True
-        if self.selectedservername == 'OpenPLi':
-            self.groups = ['dm500hd',
-             'dm800se',
-             'dm7020hd',
-             'dm8000']
-            self.downloading = True
+        self.param=param
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okClicked,
          'green': self.okClicked,
          'red': self.close,
@@ -360,44 +168,101 @@ class Servers(Screen):
     def ListToMulticontent(self):
         res = []
         theevents = []
-        self.events = []
-        self.events = self.groups
+        self.data=process_mode(self.param)
         if dwidth == 1280:
             self['list'].l.setItemHeight(34)
-            self['list'].l.setFont(0, gFont('Days', 30))
-            for i in range(0, len(self.events)):
+            self['list'].l.setFont(0, gFont('Sansation-Bold', 30))
+            for i in range(0, len(self.data)):		
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 30), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryText(pos=(30, 2), size=(540, 30), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(840, 30), font=0, flags=RT_HALIGN_LEFT, text=str(self.data[i][0])))	
                 theevents.append(res)
                 res = []
 
         else:
             self['list'].l.setItemHeight(50)
-            self['list'].l.setFont(0, gFont('Days', 40))
-            for i in range(0, len(self.events)):
+            self['list'].l.setFont(0, gFont('Sansation-Bold', 40))
+            for i in range(0, len(self.data)):
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 50), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryText(pos=(30, 2), size=(540, 50), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(1040, 50), font=0, flags=RT_HALIGN_LEFT, text=str(self.data[i][0])))
+                theevents.append(res)
+                res = []
+
+        self['list'].l.setList(theevents)
+		
+    def okClicked(self):
+        selectedserverurl = ''
+        try:
+            selection = self['list'].getCurrent()
+            cindex = self['list'].getSelectionIndex()
+            
+            param=self.data[cindex][1]
+            print "param1",param
+            self.session.open(ServerModels, param)
+        except:
+            pass		
+			
+class ServerModels(Screen):
+
+    def __init__(self, session,param=None):
+        self.session = session
+        if dwidth == 1280:
+            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/serversHD.xml'
+        else:
+            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/serversFHD.xml'
+        f = open(skin, 'r')
+        self.skin = f.read()
+        f.close()
+        Screen.__init__(self, session)
+        self['ButtonRedtext'] = Label(_('Exit'))
+        self['ButtonGreentext'] = Label(_('Please select ...'))
+        self.list = []
+        self['list'] = MenuList([], True, eListboxPythonMultiContent)
+        self.addon = 'emu'
+        self.icount = 0
+        self.downloading = False
+        self.downloading = True		
+        self.param=param
+        self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okClicked,
+         'green': self.okClicked,
+         'red': self.close,
+         'cancel': self.close}, -2)
+        self.ListToMulticontent()
+        return		
+
+    def ListToMulticontent(self):
+        res = []
+        theevents = []
+        self.data=process_mode(self.param)
+        if dwidth == 1280:
+            self['list'].l.setItemHeight(34)
+            self['list'].l.setFont(0, gFont('Sansation-Bold', 30))
+            for i in range(0, len(self.data)):		
+                res.append(MultiContentEntryText(pos=(0, 5), size=(2, 30), font=0, flags=RT_HALIGN_LEFT, text=''))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(840, 30), font=0, flags=RT_HALIGN_LEFT, text=str(self.data[i][0])))	
+                theevents.append(res)
+                res = []
+
+        else:
+            self['list'].l.setItemHeight(50)
+            self['list'].l.setFont(0, gFont('Sansation-Bold', 40))
+            for i in range(0, len(self.data)):
+                res.append(MultiContentEntryText(pos=(0, 5), size=(2, 50), font=0, flags=RT_HALIGN_LEFT, text=''))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(1040, 50), font=0, flags=RT_HALIGN_LEFT, text=str(self.data[i][0])))
                 theevents.append(res)
                 res = []
 
         self['list'].l.setList(theevents)
 
-    def okClicked(self):
-        self.searchstr = None
-        cindex = self['list'].getSelectionIndex()
-        selection = str(self.groups[cindex])
-        if self.selectedservername == '':
-            self.session.open(self.selectedservername, self.selectedserverurl, selection)
-            return
-        else:
-            self.session.open(Images, self.selectedservername, self.searchstr, selection, self.rooturl)
-            return
-            return
-
-
+    def okClicked(self):  
+            cindex = self['list'].getSelectionIndex()
+            param=self.data[cindex][1]        
+            print "paramxx",param
+            self.session.open(Images, param)
+            return			
+		
 class Images(Screen):
 
-    def __init__(self, session, selectedservername, searchstr, selection, rooturl):
+    def __init__(self, session,param=None):
         self.session = session
         if dwidth == 1280:
             skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/imagesHD.xml'
@@ -407,15 +272,11 @@ class Images(Screen):
         self.skin = f.read()
         f.close()
         Screen.__init__(self, session)
-        self.rooturl = rooturl
-        self.data = []
-        self.selection = selection
-        self.selectedservername = selectedservername
-        self.url = self.rooturl + self.selection + ''
         self['info'] = Label(_('Getting images, please wait ...'))
         self['menu'] = MenuList([], True, eListboxPythonMultiContent)
         list = []
         self.list = list
+        self.param=param 	
         self.status = []
         self.slist = []
         self['actions'] = ActionMap(['SetupActions', 'MenuActions', 'ColorActions'], {'ok': self.selclicked,
@@ -423,145 +284,61 @@ class Images(Screen):
          'cancel': self.close}, -2)
         self.itempreview = False
         self.timer = eTimer()
-        self.timer.callback.append(self.extractdata)
-        self.timer.start(100, 1)
-
-    def extractdata(self):
-        success = False
-        if self.selectedservername == 'OpenDroid' or self.selectedservername == 'PBnigma' or self.selectedservername == 'Dream Elite' or self.selectedservername == 'Merlin3' or self.selectedservername == 'OoZooN' or self.selectedservername == 'TSimage' or self.selectedservername == 'OpenHDFreaks' or self.selectedservername == 'NewNigma2' or self.selectedservername == 'Original Images 2.0':
-            success, self.data = getdata(self.url)
-            if success == True:
-                pass
-            else:
-                self['info'].setText('Sorry, error in getting images list !')
-                return
-            if len(self.data) == 0:
-                self['info'].setText('No images found !')
-                return
-        elif self.selectedservername == 'SatDreamGr' or self.selectedservername == 'OpenPLi' or self.selectedservername == 'PowerSat' or self.selectedservername == 'SatDreamGr Experimental' or self.selectedservername == 'OpenATV' or self.selectedservername == 'D.M.S.':
-            success, self.data = nfizip(self.url)
-            if success == True:
-                pass
-            else:
-                self['info'].setText('Sorry, error in getting images list !')
-                return
-            if len(self.data) == 0:
-                self['info'].setText('No images found !')
-                return
-        elif self.selectedservername == '':
-            success, self.data = getgz(self.url)
-            if success == True:
-                pass
-            else:
-                self['info'].setText('Sorry, error in getting images list !')
-                return
-            if len(self.data) == 0:
-                self['info'].setText('No images found !')
-                return
-        else:
-            success, self.data = getplidata(self.url)
-            if success == True:
-                pass
-            else:
-                self['info'].setText('Sorry, error in getting images list !')
-                return
-            if len(self.data) == 0:
-                self['info'].setText('No images found !')
-                return
-        self['info'].setText('Press OK to download selected image !')
-        self.ListToMulticontent()
-
-    def downloadxmlpage(self):
-        url = self.xmlurl
-        getPage(url).addCallback(self._gotPageLoad).addErrback(self.errorLoad)
-
-    def errorLoad(self, error):
-        print str(error)
-        self['info'].setText('Addons download failure, no internet connection or server down !')
-        self.downloading = False
-
-    def _gotPageLoad(self, data):
-        try:
-            newdata = ''
-            self.xml = data
-        except:
-            self.xml = data
-
-        if self.xml:
-            xmlstr = minidom.parseString(self.xml)
-        else:
-            self.downloading = False
-            self['info'].setText('Addons download failure, no internet connection or server down !')
-            return
-        self.data1 = []
-        self.names = []
-        icount = 0
-        list = []
-        xmlparse = xmlstr
-        self.xmlparse = xmlstr
-        self.data = []
-        print '688', self.selection
-        for images in self.xmlparse.getElementsByTagName('images'):
-            if str(images.getAttribute('cont').encode('utf8')) == self.selection:
-                for image in images.getElementsByTagName('image'):
-                    item = image.getAttribute('name').encode('utf8')
-                    urlserver = str(image.getElementsByTagName('url')[0].childNodes[0].data)
-                    imagesize = 'image size ' + str(image.getElementsByTagName('imagesize')[0].childNodes[0].data)
-                    timagesize = str(imagesize).replace('image size', '').strip()
-                    print '675', str(timagesize)
-                    urlserver = os.path.basename(urlserver)
-                    self.data.append([urlserver,
-                     '',
-                     '',
-                     timagesize])
-
-        self.downloading = True
-        if len(self.data) == 0:
-            self['info'].setText('No images found !')
-        self['info'].setText('Press OK to download selected image !')
-        self.ListToMulticontent()
+        self.timer.callback.append(self.ListToMulticontent)
+        self.timer.start(100, 1)		
 
     def ListToMulticontent(self, result = None):
         downloadpath = getDownloadPath()
         res = []
         theevents = []
+        print "self.param1",self.param		
         if dwidth == 1280:
             self['menu'].l.setItemHeight(80)
-            self['menu'].l.setFont(0, gFont('Rale', 22))
-            self.menulist = []
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 24))
+            self.data=process_mode(self.param)
+            if len(self.data)==0:
+              self['info'].setText("Failed to get or no images available !")
+              return
+            self['info'].setText("Press OK to download image !")			
             for i in range(0, len(self.data)):
-                item = str(self.data[i][0])
-                idate = str(self.data[i][1])
-                itime = str(self.data[i][2])
-                imagesize = str(self.data[i][3])
-                print item
-                if os.path.exists(downloadpath + item):
+                name=str(self.data[i][0])
+                url = str(self.data[i][1])
+                localname=os.path.split(url)[1]
+                idate = str(self.data[i][2])
+                isize = str(self.data[i][3])
+                nfiname=localname.replace(".zip","nfi")
+                if os.path.exists(downloadpath + localname) or os.path.exists(downloadpath + nfiname):
                     png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/button_red.png'
                 else:
                     png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/button_green.png'
                 res.append(MultiContentEntryText(pos=(0, 1), size=(5, 5), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 25), size=(30, 30), png=loadPNG(png)))
-                res.append(MultiContentEntryText(pos=(40, 20), size=(730, 25), font=0, flags=RT_HALIGN_LEFT, text=item))
+                res.append(MultiContentEntryPixmapAlphaTest(pos=(20, 25), size=(30, 30), png=loadPNG(png)))
+                res.append(MultiContentEntryText(pos=(40, 20), size=(930, 25), font=0, flags=RT_HALIGN_LEFT, text=name))
                 theevents.append(res)
                 res = []
 
         else:
             self['menu'].l.setItemHeight(80)
-            self['menu'].l.setFont(0, gFont('Rale', 34))
-            self.menulist = []
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 34))
+            self.data=process_mode(self.param)
+            if len(self.data)==0:
+              self['info'].setText("Failed to get or no images available !")
+              return
+            self['info'].setText("Press OK to download image !")			
             for i in range(0, len(self.data)):
-                item = str(self.data[i][0])
-                idate = str(self.data[i][1])
-                itime = str(self.data[i][2])
-                imagesize = str(self.data[i][3])
-                print item
-                if os.path.exists(downloadpath + item):
+                name=str(self.data[i][0])
+                url = str(self.data[i][1])
+                localname=os.path.split(url)[1]
+                idate = str(self.data[i][2])
+                isize = str(self.data[i][3])
+                nfiname=localname.replace(".zip","nfi")
+                if os.path.exists(downloadpath + localname) or os.path.exists(downloadpath + nfiname):
                     png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/button_red.png'
                 else:
                     png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/button_green.png'
                 res.append(MultiContentEntryText(pos=(0, 1), size=(5, 40), font=0, flags=RT_HALIGN_LEFT, text=''))
                 res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 25), size=(30, 30), png=loadPNG(png)))
-                res.append(MultiContentEntryText(pos=(40, 15), size=(900, 40), font=0, flags=RT_HALIGN_LEFT, text=item))
+                res.append(MultiContentEntryText(pos=(40, 15), size=(1100, 40), font=0, flags=RT_HALIGN_LEFT, text=name))
                 theevents.append(res)
                 res = []
 
@@ -570,65 +347,193 @@ class Images(Screen):
         self['menu'].l.setList(theevents)
         self['menu'].show()
 
-    def getfreespace(self):
-        fspace = freespace()
-        self.freespace = fspace
-        self.setTitle(self.freespace)
-
     def selclicked(self):
         cindex = self['menu'].getSelectionIndex()
-        if self.selectedservername == 'OpenPLi':
-            self.url = 'http://downloads.pli-images.org/' + 'builds/' + self.selection + '/'
-        if self.selectedservername == 'SatDreamGr':
-            self.url = 'http://sgcpm.com/satdreamgr-images/dreambox/' + self.selection + '/'
-        if self.selectedservername == 'SatDreamGr Experimental':
-            self.url = 'http://sgcpm.com/satdreamgr-images-experimental/dreambox/' + self.selection + '/'
-        if self.selectedservername == 'OpenESI':
-            self.url = 'http://www.openesi.eu/images/images/Dreambox/' + self.selection + '/'
-        if self.selectedservername == 'OpenDroid':
-            self.url = 'http://images.opendroid.org/6.4/Dreambox/' + self.selection + '/'
-        if self.selectedservername == 'NewNigma2':
-            self.url = 'http://feed.newnigma2.to/daily/' + self.selection + '/'
-        if self.selectedservername == 'Dream Elite':
-            self.url = 'http://images.dream-elite.net/DE4/index.php?dir=' + self.selection + '/&file='
-        if self.selectedservername == 'Original Images 2.0':
-            self.url = 'http://dreamboxupdate.com/opendreambox/2.0.0/images/' + self.selection + '/'
-        if self.selectedservername == 'OpenATV':
-            self.url = 'http://images.mynonpublic.com/openatv/6.1/' + self.selection + '/'
-        if self.selectedservername == 'D.M.S.':
-            self.url = 'http://www.demonisat.info/demonisat-e2Img-OE2.0/' + self.selection + '/'
-        if self.selectedservername == 'OpenHDFreaks':
-            self.url = 'http://v62.hdfreaks.cc/' + self.selection + '/'
-        if self.selectedservername == 'TSimage':
-            self.url = 'http://tunisia-dreambox.info/tsimage-feed/unstable/3.0/images/' + self.selection + '/'
-        if self.selectedservername == 'PBnigma':
-            self.url = 'http://178.63.156.75/DreamBoxImages/PBnigma/' + self.selection + '/'
-        if self.selectedservername == 'OpenLD':
-            self.url = 'http://www.odisealinux.com/Firmwares/' + 'DreamBox' + '/'
-        if self.selectedservername == 'OoZooN':
-            self.url = 'http://oozoon-download.de/opendreambox/images/' + self.selection + '/'
-        if self.selectedservername == 'Merlin3':
-            self.url = 'http://feed.merlin3.info/' + self.selection + '/'
-        if self.selectedservername == 'PowerSat':
-            self.url = 'http://www.power-sat.org/power-plus/Powersat_2.0/' + self.selection + '/'
         try:
-            imageurl = self.url + self.data[cindex][0]
+            param = self.data[cindex][1]
         except:
-            imageurl = self.url
-
-        imageurl = imageurl.strip()
-        if ' ' in imageurl:
-            self.session.open(ScreenBox, _('Sorry, the web address of image containing spaces, please report to the server maintainer to fix'), type=ScreenBox.TYPE_ERROR, timeout=5, close_on_any_key=True)
             return
-        self.imagesize = self.data[cindex][3]
-        if self.imagesize.strip() == '':
-            imagesize = '0'
+
+        self.session.openWithCallback(self.ListToMulticontent, SelectLocation, param)
+
+class SelectLocation(Screen):
+
+    def __init__(self, session, imageurl = None, imagesize = None):
+        self.session = session
+        if dwidth == 1280:
+            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/izberiHD.xml'
         else:
-            imagesize = self.data[cindex][3].replace('M', '').strip()
-        print '1190', imageurl
-        self.session.openWithCallback(self.ListToMulticontent, SelectLocation, imageurl, imagesize)
+            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/izberiFHD.xml'
+        f = open(skin, 'r')
+        self.skin = f.read()
+        f.close()
+        Screen.__init__(self, session)
+        self.menu = 0
+        self.imagesize = imagesize
+        self.imageurl = imageurl
+        self.list = []
+        self.oktext = _('')
+        self.text = ''
+        if self.menu == 0:
+            self.list.append(('Download', _('Start Download'), None))
+            self.list.append(('Downloadlocation', _('Choose Download Location'), None))
+            self.list.append(('files', _('View Downloaded Images'), None))
+        self['menu'] = List(self.list)
+        self['status'] = StaticText('')
+        self['targettext'] = StaticText(_('Selected Download Location:'))
+        fname = os.path.basename(self.imageurl)
+        if 'DreamEliteImages' in fname:
+            a = []
+            a = fname.split('=')
+            fname = a[2]
+        self['downloadtext'] = StaticText(_('Selected image to download:\n' + fname))
+        fspace = str(freespace()) + 'MB'
+        self['target'] = Label(config.plugins.ImageDownLoader2.Downloadlocation.value + '\nFree space:   ' + fspace)
+        self['shortcuts'] = ActionMap(['ShortcutActions', 'WizardActions', 'InfobarEPGActions'], {'ok': self.go,
+         'back': self.cancel,
+         'red': self.cancel}, -1)
+        self.onLayoutFinish.append(self.layoutFinished)
+        return
 
+    def layoutFinished(self):
+        idx = 0
+        self['menu'].index = idx
 
+    def fnameexists(self):
+        path = getDownloadPath()
+        filename = path + os.path.basename(self.imageurl)
+        if fileExists(filename):
+            return True
+        else:
+            return False
+
+    def callMyMsg(self, result):
+        path = getDownloadPath()
+        if self.checkmountDownloadPath(path) == False:
+            return
+        if result:
+            if fileExists('/etc/init.d/flashexpander.sh'):
+                self.session.open(ScreenBox, _('FlashExpander is used,no Image DownLoad possible.'), ScreenBox.TYPE_INFO)
+                self.cancel()
+            else:
+                runDownload = True			
+                self.localfile = path + os.path.basename(self.imageurl)				
+                self.session.openWithCallback(self.cancel, Downloader, self.imageurl, self.localfile, path)
+
+    def callMyMsg2(self, result):
+        path = config.plugins.ImageDownLoader2.Downloadlocation.value
+        if self.checkmountDownloadPath(path) == False:
+            return
+        if result:
+            if fileExists('/etc/init.d/flashexpander.sh'):
+                self.session.open(ScreenBox, _('FlashExpander is used,no Image DownLoad possible.'), ScreenBox.TYPE_INFO)
+                self.cancel()
+            else:
+                runDownload = True
+                self.session.open(makeSelectTelnet, runDownload, self.imageurl, self.imagesize, console=True)
+
+    def checkmountDownloadPath(self, path):
+        if path is None:
+            self.session.open(ScreenBox, _('nothing entered'), ScreenBox.TYPE_ERROR)
+            return False
+        elif freespace() < 60:
+            self.session.open(ScreenBox, _('Free space is less than 60MB,please choose another download location,or delete files from storage device'), ScreenBox.TYPE_ERROR)
+            return False
+        else:
+            sp = []
+            sp = path.split('/')
+            print sp
+            if len(sp) > 1:
+                if sp[1] != 'media':
+                    self.session.open(ScreenBox, mounted_string % path, ScreenBox.TYPE_ERROR)
+                    return False
+            mounted = False
+            self.swappable = False
+            sp2 = []
+            f = open('/proc/mounts', 'r')
+            m = f.readline()
+            while m and not mounted:
+                if m.find('/%s/%s' % (sp[1], sp[2])) is not -1:
+                    mounted = True
+                    print m
+                    sp2 = m.split(' ')
+                    print sp2
+                    if sp2[2].startswith('ext') or sp2[2].endswith('fat'):
+                        print '[stFlash] swappable'
+                        self.swappable = True
+                m = f.readline()
+
+            f.close()
+            if not mounted:
+                self.session.open(ScreenBox, mounted_string + str(path), ScreenBox.TYPE_ERROR)
+                return False
+            if os.path.exists(config.plugins.ImageDownLoader2.Downloadlocation.value):
+                try:
+                    os.chmod(config.plugins.ImageDownLoader2.Downloadlocation.value, 511)
+                except:
+                    pass
+
+            return True
+            return
+
+    def go(self):
+        current = self['menu'].getCurrent()
+        if current:
+            currentEntry = current[0]
+        if self.menu == 0:
+            if currentEntry == 'settings':
+                self.session.openWithCallback(self.updateSwap, SelectSetting)
+            if currentEntry == 'Download':
+                if not self.fnameexists() == True:
+                    self.session.openWithCallback(self.callMyMsg, ScreenBox, _('You selected to download:\n' + self.imageurl + '\ncontinue ?'), ScreenBox.TYPE_YESNO)
+                else:
+                    self.session.openWithCallback(self.callMyMsg, ScreenBox, _('The file already exists,\n' + 'overwrite ?'), ScreenBox.TYPE_YESNO)
+            if currentEntry == 'console':
+                if not self.fnameexists() == True:
+                    self.session.openWithCallback(self.callMyMsg2, ScreenBox, _('You selected to download  ' + self.imageurl + ',continue?'), ScreenBox.TYPE_YESNO)
+                else:
+                    self.session.openWithCallback(self.callMyMsg2, ScreenBox, _('The file aleady exists ' + ',overwrite?'), ScreenBox.TYPE_YESNO)
+            if currentEntry == 'files':
+                self.session.open(DownloadedFiles)
+            elif currentEntry == 'Downloadlocation':
+                self.session.openWithCallback(self.Downloadlocation_choosen, SelectDownloadLocation)
+
+    def updateSwap(self, retval):
+        self['swapsize'].setText(''.join(config.plugins.ImageDownLoader2.swap.value + ' MB'))
+
+    def Downloadlocation_choosen(self, option):
+        self.updateTarget()
+        if option is not None:
+            config.plugins.ImageDownLoader2.Downloadlocation.value = str(option[1])
+        config.plugins.ImageDownLoader2.Downloadlocation.save()
+        config.plugins.ImageDownLoader2.save()
+        config.save()
+        self.createDownloadfolders()
+        return
+
+    def createDownloadfolders(self):
+        self.Downloadpath = getDownloadPath()
+        try:
+            if os_path.exists(self.Downloadpath) == False:
+                makedirs(self.Downloadpath)
+        except OSError:
+            self.session.openWithCallback(self.goagaintoDownloadlocation, ScreenBox, _('Sorry, your Download destination is not writeable.\n\nPlease choose another one.'), ScreenBox.TYPE_ERROR)
+
+    def goagaintoDownloadlocation(self, retval):
+        self.session.openWithCallback(self.Downloadlocation_choosen, SelectDownloadLocation)
+
+    def updateTarget(self):
+        fspace = str(freespace()) + 'MB'
+        self['target'].setText(''.join(config.plugins.ImageDownLoader2.Downloadlocation.value + ' Freespace:' + fspace))
+
+    def cancel(self, result = None):
+        self.close(None)
+        return
+
+    def runUpgrade(self, result):
+        if result:
+            self.session.open()
+		
 class SelectDownloadLocation(Screen, HelpableScreen):
 
     def __init__(self, session, text = '', filename = '', currDir = None, location = None, userMode = False, minFree = None, autoAdd = False, editDir = False, inhibitDirs = [], inhibitMounts = []):
@@ -672,7 +577,7 @@ class SelectDownloadLocation(Screen, HelpableScreen):
          '/MB_Images']
         inhibitMounts = ['/mnt', '/ba', '/MB_Images']
         self['filelist'] = FileList(currDir, showDirectories=True, showFiles=False, inhibitMounts=inhibitMounts, inhibitDirs=inhibitDirs)
-        self['mountlist'] = MenuList(mountedDevs)
+#        self['mountlist'] = MenuList(mountedDevs)
         self['ButtonGreentext'] = Label(_('SAVE'))
         self['ButtonRedtext'] = Label(_('Exit'))
         self['target'] = Label()
@@ -821,7 +726,6 @@ class SelectDownloadLocation(Screen, HelpableScreen):
                 self.saveSelection(True)
         return
 
-
 class DownloadedFiles(Screen):
 
     def __init__(self, session):
@@ -853,20 +757,6 @@ class DownloadedFiles(Screen):
          'red': self.close,
          'cancel': self.close}, -2)
         self.fillplgfolders()
-
-    def deflatezip(self):
-        fname = self['menu'].getCurrent()
-        cindex = self['menu'].getSelectionIndex()
-        filename = self.folder + self.nfifiles[cindex][0]
-        self.path = self.folder
-        nfifile = filename.replace('.zip', '.nfi')
-        self.nfifile = nfifile
-        extractSTR = 'unzip -o ' + filename + ' -d /' + self.path
-        info = 'Extract the selected image now?'
-        instr = 'Extracting ' + filename + '\nplease wait.............................'
-        endstr = 'Press OK to exit'
-        dom = fname
-        self.session.open(Konzola, _('Exracting: %s') % dom, [extractSTR], self.fillplgfolders, False, instr, endstr)
 
     def delimage(self):
         fname = self['menu'].getCurrent()
@@ -906,7 +796,7 @@ class DownloadedFiles(Screen):
         self.events = self.nfifiles
         if dwidth == 1280:
             self['menu'].l.setItemHeight(40)
-            self['menu'].l.setFont(0, gFont('Rale', 25))
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 25))
             for i in range(0, len(self.events)):
                 mfile = self.events[i][0]
                 msize = self.events[i][1] + 'MB'
@@ -918,7 +808,7 @@ class DownloadedFiles(Screen):
 
         else:
             self['menu'].l.setItemHeight(45)
-            self['menu'].l.setFont(0, gFont('Rale', 35))
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 35))
             for i in range(0, len(self.events)):
                 mfile = self.events[i][0]
                 msize = self.events[i][1] + 'MB'
@@ -930,194 +820,6 @@ class DownloadedFiles(Screen):
 
         self['menu'].l.setList(theevents)
         self['menu'].show()
-
-
-class SelectLocation(Screen):
-
-    def __init__(self, session, imageurl = None, imagesize = None):
-        self.session = session
-        if dwidth == 1280:
-            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/izberiHD.xml'
-        else:
-            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/izberiFHD.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
-        f.close()
-        Screen.__init__(self, session)
-        self.menu = 0
-        self.imagesize = imagesize
-        self.imageurl = imageurl
-        self.list = []
-        self.oktext = _('')
-        self.text = ''
-        if self.menu == 0:
-            self.list.append(('Download', _('Start Download'), None))
-            self.list.append(('Downloadlocation', _('Choose Download Location'), None))
-            self.list.append(('files', _('View Downloaded Images'), None))
-        self['menu'] = List(self.list)
-        self['status'] = StaticText('')
-        self['targettext'] = StaticText(_('Selected Download Location:'))
-        fname = os.path.basename(self.imageurl)
-        if 'DreamEliteImages' in fname:
-            a = []
-            a = fname.split('=')
-            fname = a[2]
-        self['downloadtext'] = StaticText(_('Selected image to download:\n' + fname))
-        fspace = str(freespace()) + 'MB'
-        self['target'] = Label(config.plugins.ImageDownLoader2.Downloadlocation.value + '\nFree space:   ' + fspace)
-        self['shortcuts'] = ActionMap(['ShortcutActions', 'WizardActions', 'InfobarEPGActions'], {'ok': self.go,
-         'back': self.cancel,
-         'red': self.cancel}, -1)
-        self.onLayoutFinish.append(self.layoutFinished)
-        return
-
-    def layoutFinished(self):
-        idx = 0
-        self['menu'].index = idx
-
-    def fnameexists(self):
-        path = getDownloadPath()
-        filename = path + os.path.basename(self.imageurl)
-        if fileExists(filename):
-            return True
-        else:
-            return False
-
-    def callMyMsg(self, result):
-        path = getDownloadPath()
-        if self.checkmountDownloadPath(path) == False:
-            return
-        if result:
-            if fileExists('/etc/init.d/flashexpander.sh'):
-                self.session.open(ScreenBox, _('FlashExpander is used,no Image DownLoad possible.'), ScreenBox.TYPE_INFO)
-                self.cancel()
-            else:
-                runDownload = True
-                self.localfile = path + os.path.basename(self.imageurl)
-                self.session.openWithCallback(self.cancel, Downloader, self.imageurl, self.localfile, path)
-
-    def callMyMsg2(self, result):
-        path = config.plugins.ImageDownLoader2.Downloadlocation.value
-        if self.checkmountDownloadPath(path) == False:
-            return
-        if result:
-            if fileExists('/etc/init.d/flashexpander.sh'):
-                self.session.open(ScreenBox, _('FlashExpander is used,no Image DownLoad possible.'), ScreenBox.TYPE_INFO)
-                self.cancel()
-            else:
-                runDownload = True
-                self.session.open(makeSelectTelnet, runDownload, self.imageurl, self.imagesize, console=True)
-
-    def checkmountDownloadPath(self, path):
-        if path is None:
-            self.session.open(ScreenBox, _('nothing entered'), ScreenBox.TYPE_ERROR)
-            return False
-        elif freespace() < 60:
-            self.session.open(ScreenBox, _('Free space is less than 60MB,please choose another download location,or delete files from storage device'), ScreenBox.TYPE_ERROR)
-            return False
-        else:
-            sp = []
-            sp = path.split('/')
-            print sp
-            if len(sp) > 1:
-                if sp[1] != 'media':
-                    self.session.open(ScreenBox, mounted_string % path, ScreenBox.TYPE_ERROR)
-                    return False
-            mounted = False
-            self.swappable = False
-            sp2 = []
-            f = open('/proc/mounts', 'r')
-            m = f.readline()
-            while m and not mounted:
-                if m.find('/%s/%s' % (sp[1], sp[2])) is not -1:
-                    mounted = True
-                    print m
-                    sp2 = m.split(' ')
-                    print sp2
-                    if sp2[2].startswith('ext') or sp2[2].endswith('fat'):
-                        print '[stFlash] swappable'
-                        self.swappable = True
-                m = f.readline()
-
-            f.close()
-            if not mounted:
-                self.session.open(ScreenBox, mounted_string + str(path), ScreenBox.TYPE_ERROR)
-                return False
-            if os.path.exists(config.plugins.ImageDownLoader2.Downloadlocation.value):
-                try:
-                    os.chmod(config.plugins.ImageDownLoader2.Downloadlocation.value, 511)
-                except:
-                    pass
-
-            return True
-            return
-
-    def go(self):
-        current = self['menu'].getCurrent()
-        if current:
-            currentEntry = current[0]
-        if self.menu == 0:
-            if currentEntry == 'settings':
-                self.session.openWithCallback(self.updateSwap, SelectSetting)
-            if currentEntry == 'Download':
-                if not self.fnameexists() == True:
-                    self.session.openWithCallback(self.callMyMsg, ScreenBox, _('You selected to download:\n' + self.imageurl + '\ncontinue ?'), ScreenBox.TYPE_YESNO)
-                else:
-                    self.session.openWithCallback(self.callMyMsg, ScreenBox, _('The file already exists,\n' + 'overwrite ?'), ScreenBox.TYPE_YESNO)
-            if currentEntry == 'console':
-                if not self.fnameexists() == True:
-                    self.session.openWithCallback(self.callMyMsg2, ScreenBox, _('You selected to download  ' + self.imageurl + ',continue?'), ScreenBox.TYPE_YESNO)
-                else:
-                    self.session.openWithCallback(self.callMyMsg2, ScreenBox, _('The file aleady exists ' + ',overwrite?'), ScreenBox.TYPE_YESNO)
-            if currentEntry == 'files':
-                self.session.open(DownloadedFiles)
-            elif currentEntry == 'Downloadlocation':
-                self.session.openWithCallback(self.Downloadlocation_choosen, SelectDownloadLocation)
-
-    def updateSwap(self, retval):
-        self['swapsize'].setText(''.join(config.plugins.ImageDownLoader2.swap.value + ' MB'))
-
-    def Downloadlocation_choosen(self, option):
-        self.updateTarget()
-        if option is not None:
-            config.plugins.ImageDownLoader2.Downloadlocation.value = str(option[1])
-        config.plugins.ImageDownLoader2.Downloadlocation.save()
-        config.plugins.ImageDownLoader2.save()
-        config.save()
-        self.createDownloadfolders()
-        return
-
-    def createDownloadfolders(self):
-        self.Downloadpath = getDownloadPath()
-        try:
-            if os_path.exists(self.Downloadpath) == False:
-                makedirs(self.Downloadpath)
-        except OSError:
-            self.session.openWithCallback(self.goagaintoDownloadlocation, ScreenBox, _('Sorry, your Download destination is not writeable.\n\nPlease choose another one.'), ScreenBox.TYPE_ERROR)
-
-    def goagaintoDownloadlocation(self, retval):
-        self.session.openWithCallback(self.Downloadlocation_choosen, SelectDownloadLocation)
-
-    def updateTarget(self):
-        fspace = str(freespace()) + 'MB'
-        self['target'].setText(''.join(config.plugins.ImageDownLoader2.Downloadlocation.value + ' Freespace:' + fspace))
-
-    def DownloadDone(self, retval = None):
-        if retval is False:
-            self.session.open(ScreenBox, _(''), ScreenBox.TYPE_ERROR, timeout=10)
-        elif config.plugins.ImageDownLoader2.update.value == True:
-            self.session.open()
-        else:
-            self.cancel()
-
-    def cancel(self, result = None):
-        self.close(None)
-        return
-
-    def runUpgrade(self, result):
-        if result:
-            self.session.open()
-
 
 class Downloader(Screen):
 
@@ -1173,6 +875,12 @@ class Downloader(Screen):
             if self.target.endswith('.zip'):
                 info = 'The image downloaded successfully !'
                 self.session.openWithCallback(self.close, ScreenBox, _(info), type=ScreenBox.TYPE_INFO, timeout=3)
+            elif self.target.endswith('.tar.xz'):
+                info = 'The image downloaded successfully !'
+                self.session.openWithCallback(self.close, ScreenBox, _(info), type=ScreenBox.TYPE_INFO, timeout=3)
+            elif self.target.endswith('.nfi'):
+                info = 'The image downloaded successfully !'
+                self.session.openWithCallback(self.close, ScreenBox, _(info), type=ScreenBox.TYPE_INFO, timeout=3)				
             else:
                 self.close
                 return
@@ -1203,7 +911,6 @@ class Downloader(Screen):
 
     def exit(self, result = None):
         self.close()
-
 
 class ScreenBox(Screen):
     TYPE_YESNO = 0
@@ -1243,8 +950,8 @@ class ScreenBox(Screen):
             self['QuestionPixmap'].hide()
         if picon != self.TYPE_INFO:
             self['InfoPixmap'].hide()
-        if picon != self.TYPE_WARNING:
-            self['WarningPixmap'].hide()
+#        if picon != self.TYPE_WARNING:
+#            self['WarningPixmap'].hide()
         self.title = self.type < self.TYPE_MESSAGE and [_('Question'),
          _('Information'),
          _('Warning'),
@@ -1284,7 +991,10 @@ class ScreenBox(Screen):
         self.timeout = timeout
         if timeout > 0:
             self.timer = eTimer()
-            self.timer.callback.append(self.timerTick)
+            try:
+             self.timer_conn = self.timer.timeout.connect(self.timerTick)
+            except:		
+             self.timer.callback.append(self.timerTick)
             self.onExecBegin.append(self.startTimer)
             self.origTitle = None
             if self.execing:

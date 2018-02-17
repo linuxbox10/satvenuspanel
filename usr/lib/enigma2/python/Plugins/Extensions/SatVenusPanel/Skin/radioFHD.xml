@@ -1,7 +1,7 @@
-	<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
+<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
     <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />	
 	
-	<widget name="text" position="210,250" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" backgroundColorSelected="#40000000" foregroundColor="#66ff00" foregroundColorSelected="#cc0000" size="830,640" scrollbarMode="showNever" transparent="1" zPosition="2" /> 
+	<widget name="text" position="210,240" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" backgroundColorSelected="#40000000" foregroundColor="#66ff00" foregroundColorSelected="#cc0000" size="830,640" scrollbarMode="showNever" transparent="1" zPosition="2" /> 
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="210,181" size="800,1" zPosition="10" alphatest="blend" />
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="210,217" size="800,1" zPosition="10" alphatest="blend" />	
 	<ePixmap pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/linefhd.png" position="210,867" size="800,1" zPosition="10" alphatest="blend" />

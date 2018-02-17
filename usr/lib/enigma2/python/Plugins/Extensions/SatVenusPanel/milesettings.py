@@ -1,4 +1,7 @@
 # Embedded file name: /usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/milesettings.py
+from Components.Pixmap import Pixmap
+from Tools.Directories import SCOPE_SKIN_IMAGE, resolveFilename
+from enigma import eTimer
 from Screens.Screen import Screen
 from Components.Sources.List import List
 from Components.ActionMap import ActionMap
@@ -14,8 +17,8 @@ from Components.Harddisk import harddiskmanager
 from Components.PluginComponent import plugins
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 from Plugins.Plugin import PluginDescriptor
-from SettingsList import SettingsList
-from SettingsList import ScreenBox
+from SettingsList import SettingsList, ActionBox
+from image_viewer import ScreenBox
 from Screens.MessageBox import MessageBox
 import os
 import shutil
@@ -194,43 +197,3 @@ class Satvenus(SettingsList):
         self.skin = f.read()
         f.close()
 
-
-from Screens.Screen import Screen
-from Components.Label import Label
-from Components.Pixmap import Pixmap
-from Tools.Directories import SCOPE_SKIN_IMAGE, resolveFilename
-from enigma import eTimer
-import os
-import sys
-
-class ActionBox(Screen):
-
-    def __init__(self, session, message, title, action):
-        self.session = session
-        if DESKHEIGHT < 1000:
-            skin = skin_path + 'akcionHD.xml'
-        else:
-            skin = skin_path + 'akcionFHD.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
-        f.close()
-        Screen.__init__(self, session)
-        self.ctitle = title
-        self.caction = action
-        self['message'] = Label(message)
-        self['logo'] = Pixmap()
-        self.timer = eTimer()
-        self.timer.callback.append(self.__setTitle)
-        self.timer.start(200, 1)
-
-    def __setTitle(self):
-        if self['logo'].instance is not None:
-            self['logo'].instance.setPixmapFromFile(os.path.dirname(sys.modules[__name__].__file__) + '/images/run.png')
-        self.setTitle(self.ctitle)
-        self.timer = eTimer()
-        self.timer.callback.append(self.__start)
-        self.timer.start(200, 1)
-        return
-
-    def __start(self):
-        self.close(self.caction())

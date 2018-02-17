@@ -1,4 +1,4 @@
-# Embedded file name: /usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/vuimages.py
+# Embedded file name: /usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/backup.py
 from Plugins.Plugin import PluginDescriptor
 from Screens.Console import Console
 from Screens.ChoiceBox import ChoiceBox
@@ -28,6 +28,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.MultiContent import MultiContentEntryText, MultiContentEntryPixmapAlphaTest
 from Components.SelectionList import SelectionList
 from Components.PluginComponent import plugins
+from Components.AVSwitch import AVSwitch
 from twisted.web.client import downloadPage, getPage
 from socket import gethostbyname
 from xml.dom.minidom import parse, getDOMImplementation
@@ -41,11 +42,11 @@ from os import path as os_path, system as os_system, unlink, stat, mkdir, popen,
 from os import environ, system, path, listdir, remove
 from time import time, gmtime, strftime, localtime
 from stat import ST_MTIME
+from image_viewer import ScreenBox
 import datetime
 import urllib2
 import gettext
 import os
-from vudata import getdata, getplidata
 config.plugins.ImageDownLoader2 = ConfigSubsection()
 config.plugins.ImageDownLoader2.addstr = ConfigText(default='tsimage')
 config.plugins.ImageDownLoader2.Downloadlocation = ConfigText(default='/media/', visible_width=50, fixed_size=False)
@@ -66,14 +67,11 @@ mountedDevs = []
 for p in harddiskmanager.getMountedPartitions(True):
     mountedDevs.append((p.mountpoint, _(p.description) if p.description else ''))
 
-mounted_string = 'Nothing mounted at '
-
 def _(txt):
-    t = gettext.dgettext('I', txt)
+    t = gettext.dgettext('ImageDownLoader', txt)
     if t == txt:
         t = gettext.gettext(txt)
     return t
-
 
 def getDownloadPath():
     Downloadpath = config.plugins.ImageDownLoader2.Downloadlocation.value
@@ -81,7 +79,6 @@ def getDownloadPath():
         return Downloadpath
     else:
         return Downloadpath + '/'
-
 
 def freespace():
     downloadlocation = getDownloadPath()
@@ -96,8 +93,7 @@ def freespace():
     except:
         return 0
 
-
-class Feeds(Screen):
+class buFeeds(Screen):
 
     def __init__(self, session):
         self.session = session
@@ -114,52 +110,16 @@ class Feeds(Screen):
         self['ButtonRedtext'] = Label(_('Exit'))
         self['ButtonGreentext'] = Label(_('Please select ...'))
         if currversion == 'eo2.0':
-            self.serversnames = ['SatDreamGr',
-             'OpenSPA',
-             'OpenATV',
-             'OpenDroid',
-             'OpenESI',
-             'OpenPLi',
-             'OpenLD',
-             'SFteam',
-             'Original Images 3.0',
-             'BlackHole',
-             'OpenBlackHole',
-             'OpenViX',
-             'OpenHDFreaks',
-             'VTi',
-             'PBnigma',
-             'HDMU',
-             'ruDREAM',
-             'OPenPlus',
-             'OpenNFR',
-             'PKT',
-             'ViX4E2PROJECT',
-             'ItalySat',
-             'Custom Builds']
-            self.serversurls = ['http://sgcpm.com/satdreamgr-images-experimental/vu/',
-             'http://178.63.156.75/VuPlusImages/SPA/',
-             'http://images.mynonpublic.com/openatv/6.1/index.php?open=',
-             'http://images.opendroid.org/6.4/VU+/index.php?dir=',
-             'http://www.openesi.eu/images/images/index.php?dir=VU%2B/',
-             'http://178.63.156.75/VuPlusImages/OpenPLi/',
-             'http://178.63.156.75/VuPlusImages/OpenLD/',
-             'http://178.63.156.75/VuPlusImages/SFteam/',
-             'http://178.63.156.75/VuPlusImages/Original/',
-             'http://178.63.156.75/VuPlusImages/BlackHole/',
-             'http://178.63.156.75/VuPlusImages/OpenBlackHole/',
-             'http://178.63.156.75/VuPlusImages/OpenViX/',
-             'http://v62.hdfreaks.cc/',
-             'http://178.63.156.75/VuPlusImages/VTi/',
-             'http://178.63.156.75/VuPlusImages/PBnigma/',
-             'http://178.63.156.75/VuPlusImages/HDMU/',
-             'http://178.63.156.75/VuPlusImages/ruDREAM/',
-             'http://178.63.156.75/VuPlusImages/OPenPlus/',
-             'http://178.63.156.75/VuPlusImages/OpenNFR/',
-             'http://178.63.156.75/VuPlusImages/PKT/',
-             'http://178.63.156.75/VuPlusImages/ViX4E2PROJECT/',
-             'http://178.63.156.75/VuPlusImages/ItalySat/',
-             'http://178.63.156.75/VuPlusImages/Custom/']
+            self.serversnames = ['</ zvonko67',
+             '</ G_ogi',
+             '</ dragec11',
+             '</ jopidane',
+             '</ mika (www.satelitin.com)']
+            self.serversurls = ['http://178.63.156.75/BackUpImages/zvonko67/',
+             'http://178.63.156.75/BackUpImages/G_ogi/',
+             'http://178.63.156.75/BackUpImages/dragec11/',
+             'http://178.63.156.75/BackUpImages/jopidane/',
+             'http://178.63.156.75/BackUpImages/mika/']
         self.list = []
         self['text'] = MenuList([], True, eListboxPythonMultiContent)
         self.addon = 'emu'
@@ -178,7 +138,7 @@ class Feeds(Screen):
         self.events = self.serversnames
         if dwidth == 1280:
             self['text'].l.setItemHeight(34)
-            self['text'].l.setFont(0, gFont('Rale', 24))
+            self['text'].l.setFont(0, gFont('Sansation-Bold', 24))
             for i in range(0, len(self.events)):
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 35), font=0, flags=RT_HALIGN_LEFT, text=''))
                 res.append(MultiContentEntryText(pos=(30, 2), size=(720, 35), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
@@ -187,7 +147,7 @@ class Feeds(Screen):
 
         else:
             self['text'].l.setItemHeight(50)
-            self['text'].l.setFont(0, gFont('Rale', 40))
+            self['text'].l.setFont(0, gFont('Sansation-Bold', 40))
             for i in range(0, len(self.events)):
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 50), font=0, flags=RT_HALIGN_LEFT, text=''))
                 res.append(MultiContentEntryText(pos=(30, 2), size=(720, 50), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
@@ -214,7 +174,6 @@ class Feeds(Screen):
         except:
             pass
 
-
 class Servers(Screen):
 
     def __init__(self, session, selectedservername = None, selectedserverurl = None):
@@ -239,261 +198,20 @@ class Servers(Screen):
         self.searchstr = None
         self.downloading = False
         self.data = []
-        if self.selectedservername == 'Original Images 3.0':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'bm750',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
+        if self.selectedservername == '</ zvonko67':
+            self.groups = ['VuPlus_Solo2']
             self.downloading = True
-        if self.selectedservername == 'BlackHole':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'bm750',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
+        if self.selectedservername == '</ G_ogi':
+            self.groups = ['VuPlus_Uno4K', 'VuPlus_SoloSEv2', 'DreamBox_520HD']
             self.downloading = True
-        if self.selectedservername == 'PBnigma':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
+        if self.selectedservername == '</ dragec11':
+            self.groups = ['Dreambox_800HDse', 'VuPlus_Zero4K']
             self.downloading = True
-        if self.selectedservername == 'ViX4E2PROJECT':
-            self.groups = ['vuzero',
-             'vusolo',
-             'vusolo2',
-             'vuduo',
-             'vuduo2']
+        if self.selectedservername == '</ jopidane':
+            self.groups = ['Dreambox_7020HD']
             self.downloading = True
-        if self.selectedservername == 'OpenLD':
-            self.groups = ['VuPlus']
-            self.downloading = True
-        if self.selectedservername == 'OpenBlackHole':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'bm750',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'OpenSPA':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k']
-            self.downloading = True
-        if self.selectedservername == 'ruDREAM':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'OpenATV':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'OpenViX':
-            self.groups = ['Vu+Duo',
-             'Vu+Duo2',
-             'Vu+Solo',
-             'Vu+Solo2',
-             'Vu+Solo-SE',
-             'Vu+Uno',
-             'Vu+Zero',
-             'Vu+Ultimo',
-             'Vu+Solo4K',
-             'Vu+Uno4K',
-             'Vu+Ultimo4K']
-            self.downloading = True
-        if self.selectedservername == 'OpenHDFreaks':
-            self.groups = ['vuduo',
-             'vusolo',
-             'vusolose',
-             'vuzero']
-            self.downloading = True
-        if self.selectedservername == 'VTi':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'bm750',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'HDMU':
-            self.groups = ['vuduo', 'vusolo2', 'vuzero']
-        if self.selectedservername == 'SatDreamGr':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'SatDreamGr Experimental':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'OpenDroid':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'OpenESI':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'OPenPlus':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose']
-            self.downloading = True
-        if self.selectedservername == 'SFteam':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'PKT':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'bm750',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'ItalySat':
-            self.groups = ['VuPlus']
-            self.downloading = True
-        if self.selectedservername == 'OpenNFR':
-            self.groups = ['vusolo2',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuultimo4k']
-            self.downloading = True
-        elif self.selectedservername == 'OpenPLi':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
-            self.downloading = True
-        if self.selectedservername == 'Custom Builds':
-            self.groups = ['vuzero',
-             'vuuno',
-             'vusolo',
-             'vusolo2',
-             'vuultimo',
-             'vuduo',
-             'vuduo2',
-             'vusolose',
-             'vusolo4k',
-             'vuuno4k',
-             'vuultimo4k']
+        if self.selectedservername == '</ mika (www.satelitin.com)':
+            self.groups = ['Golden_Intestar_Xpeed_LX_Class_S2', 'VuPlus_Uno4K']
             self.downloading = True
         self['actions'] = ActionMap(['SetupActions', 'ColorActions'], {'ok': self.okClicked,
          'green': self.okClicked,
@@ -509,19 +227,19 @@ class Servers(Screen):
         self.events = self.groups
         if dwidth == 1280:
             self['list'].l.setItemHeight(34)
-            self['list'].l.setFont(0, gFont('Days', 30))
+            self['list'].l.setFont(0, gFont('Sansation-Bold', 30))
             for i in range(0, len(self.events)):
-                res.append(MultiContentEntryText(pos=(0, 5), size=(2, 30), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryText(pos=(30, 2), size=(840, 30), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
+                res.append(MultiContentEntryText(pos=(0, 5), size=(2, 34), font=0, flags=RT_HALIGN_LEFT, text=''))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(740, 34), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
                 theevents.append(res)
                 res = []
 
         else:
             self['list'].l.setItemHeight(50)
-            self['list'].l.setFont(0, gFont('Days', 40))
+            self['list'].l.setFont(0, gFont('Sansation-Bold', 40))
             for i in range(0, len(self.events)):
                 res.append(MultiContentEntryText(pos=(0, 5), size=(2, 50), font=0, flags=RT_HALIGN_LEFT, text=''))
-                res.append(MultiContentEntryText(pos=(30, 2), size=(1040, 50), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
+                res.append(MultiContentEntryText(pos=(30, 2), size=(740, 50), font=0, flags=RT_HALIGN_LEFT, text=self.events[i]))
                 theevents.append(res)
                 res = []
 
@@ -538,7 +256,6 @@ class Servers(Screen):
             self.session.open(Images, self.selectedservername, self.searchstr, selection, self.rooturl)
             return
             return
-
 
 class Images(Screen):
 
@@ -568,12 +285,15 @@ class Images(Screen):
          'cancel': self.close}, -2)
         self.itempreview = False
         self.timer = eTimer()
-        self.timer.callback.append(self.extractdata)
+        try:
+           self.timer_conn = self.timer.timeout.connect(self.extractdata)
+        except:			
+         self.timer.callback.append(self.extractdata)
         self.timer.start(100, 1)
 
     def extractdata(self):
         success = False
-        if self.selectedservername == 'SatDreamGr Experimental' or self.selectedservername == 'Custom Builds' or self.selectedservername == 'ruDREAM' or self.selectedservername == 'ViX4E2PROJECT' or self.selectedservername == 'SFteam' or self.selectedservername == 'OpenPLi' or self.selectedservername == 'PKT' or self.selectedservername == 'ItalySat' or self.selectedservername == 'OpenNFR' or self.selectedservername == 'HDMU' or self.selectedservername == 'OpenSPA' or self.selectedservername == 'Original Images 3.0' or self.selectedservername == 'OpenATV' or self.selectedservername == 'OPenPlus' or self.selectedservername == 'VTi' or self.selectedservername == 'OpenHDFreaks' or self.selectedservername == 'OpenViX' or self.selectedservername == 'PBnigma' or self.selectedservername == 'SatDreamGr' or self.selectedservername == 'OpenDroid' or self.selectedservername == 'OpenESI' or self.selectedservername == 'BlackHole' or self.selectedservername == 'OpenBlackHole' or self.selectedservername == 'OpenLD':
+        if self.selectedservername == '</ zvonko67' or self.selectedservername == '</ mika (www.satelitin.com)' or self.selectedservername == '</ G_ogi' or self.selectedservername == '</ dragec11' or self.selectedservername == '</ jopidane':
             success, self.data = getdata(self.url)
             if success == True:
                 pass
@@ -652,7 +372,7 @@ class Images(Screen):
         theevents = []
         if dwidth == 1280:
             self['menu'].l.setItemHeight(80)
-            self['menu'].l.setFont(0, gFont('Rale', 22))
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 22))
             self.menulist = []
             for i in range(0, len(self.data)):
                 item = str(self.data[i][0])
@@ -666,13 +386,13 @@ class Images(Screen):
                     png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/button_green.png'
                 res.append(MultiContentEntryText(pos=(0, 1), size=(5, 5), font=0, flags=RT_HALIGN_LEFT, text=''))
                 res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 25), size=(30, 30), png=loadPNG(png)))
-                res.append(MultiContentEntryText(pos=(40, 20), size=(930, 25), font=0, flags=RT_HALIGN_LEFT, text=item))
+                res.append(MultiContentEntryText(pos=(40, 20), size=(730, 25), font=0, flags=RT_HALIGN_LEFT, text=item))
                 theevents.append(res)
                 res = []
 
         else:
             self['menu'].l.setItemHeight(80)
-            self['menu'].l.setFont(0, gFont('Rale', 34))
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 34))
             self.menulist = []
             for i in range(0, len(self.data)):
                 item = str(self.data[i][0])
@@ -686,7 +406,7 @@ class Images(Screen):
                     png = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/button_green.png'
                 res.append(MultiContentEntryText(pos=(0, 1), size=(5, 40), font=0, flags=RT_HALIGN_LEFT, text=''))
                 res.append(MultiContentEntryPixmapAlphaTest(pos=(5, 25), size=(30, 30), png=loadPNG(png)))
-                res.append(MultiContentEntryText(pos=(40, 15), size=(1100, 40), font=0, flags=RT_HALIGN_LEFT, text=item))
+                res.append(MultiContentEntryText(pos=(40, 15), size=(900, 40), font=0, flags=RT_HALIGN_LEFT, text=item))
                 theevents.append(res)
                 res = []
 
@@ -702,54 +422,16 @@ class Images(Screen):
 
     def selclicked(self):
         cindex = self['menu'].getSelectionIndex()
-        if self.selectedservername == 'Custom Builds':
-            self.url = 'http://178.63.156.75/VuPlusImages/Custom/' + self.selection + '/'
-        if self.selectedservername == 'OpenPLi':
-            self.url = 'http://downloads.pli-images.org/builds/' + self.selection + '/'
-        if self.selectedservername == 'SatDreamGr':
-            self.url = 'http://sgcpm.com/satdreamgr-images-experimental/vu/' + self.selection + '/'
-        if self.selectedservername == 'SatDreamGr Experimental':
-            self.url = 'http://sgcpm.com/satdreamgr-images-experimental/vu/' + self.selection + '/'
-        if self.selectedservername == 'OpenESI':
-            self.url = 'http://www.openesi.eu/images/images/VU+/' + self.selection + '/'
-        if self.selectedservername == 'OpenDroid':
-            self.url = 'http://images.opendroid.org/6.4/VU+/' + self.selection + '/'
-        if self.selectedservername == 'Original Images 3.0':
-            self.url = 'http://code.vuplus.com/download/boximages/30/' + self.selection + '/'
-        if self.selectedservername == 'BlackHole':
-            self.url = 'http://178.63.156.75/VuPlusImages/BlackHole/' + self.selection + '/'
-        if self.selectedservername == 'OpenBlackHole':
-            self.url = 'http://178.63.156.75/VuPlusImages/OpenBlackHole/' + self.selection + '/'
-        if self.selectedservername == 'OPenPlus':
-            self.url = 'http://178.63.156.75/VuPlusImages/OPenPlus/' + self.selection + '/'
-        if self.selectedservername == 'ViX4E2PROJECT':
-            self.url = 'http://178.63.156.75/VuPlusImages/ViX4E2PROJECT/' + self.selection + '/'
-        if self.selectedservername == 'OpenATV':
-            self.url = 'http://images.mynonpublic.com/openatv/6.1/' + self.selection + '/'
-        if self.selectedservername == 'OpenViX':
-            self.url = 'http://www.openvix.co.uk/openvix-builds/' + self.selection + '/'
-        if self.selectedservername == 'SFteam':
-            self.url = 'http://178.63.156.75/VuPlusImages/SFteam/' + self.selection + '/'
-        if self.selectedservername == 'OpenHDFreaks':
-            self.url = 'http://v62.hdfreaks.cc/' + self.selection + '/'
-        if self.selectedservername == 'VTi':
-            self.url = 'http://178.63.156.75/VuPlusImages/VTi/' + self.selection + '/'
-        if self.selectedservername == 'ruDREAM':
-            self.url = 'http://178.63.156.75/VuPlusImages/ruDREAM/' + self.selection + '/'
-        if self.selectedservername == 'PBnigma':
-            self.url = 'http://178.63.156.75/VuPlusImages/PBnigma/' + self.selection + '/'
-        if self.selectedservername == 'OpenLD':
-            self.url = 'http://www.odisealinux.com/Firmwares/' + 'VuPlus' + '/'
-        if self.selectedservername == 'OpenSPA':
-            self.url = 'https://openspa.webhop.info/Descarga%20de%20Im%C3%A1genes/Vuplus/' + self.selection + '/'
-        if self.selectedservername == 'HDMU':
-            self.url = 'http://images.hdmedia-universe.com/mips/' + self.selection + '/'
-        if self.selectedservername == 'OpenNFR':
-            self.url = 'http://dev.nachtfalke.biz/nfr/feeds/6.1/images/' + self.selection + '/'
-        if self.selectedservername == 'ItalySat':
-            self.url = 'http://178.63.156.75/VuPlusImages/ItalySat/' + self.selection + '/'
-        if self.selectedservername == 'PKT':
-            self.url = 'http://e2.pkteam.pl/IMAGE%20VU%2B/HYPERION%205.7' + '/'
+        if self.selectedservername == '</ zvonko67':
+            self.url = 'http://178.63.156.75/BackUpImages/zvonko67/' + self.selection + '/'
+        if self.selectedservername == '</ G_ogi':
+            self.url = 'http://178.63.156.75/BackUpImages/G_ogi/' + self.selection + '/'
+        if self.selectedservername == '</ mika (www.satelitin.com)':
+            self.url = 'http://178.63.156.75/BackUpImages/mika/' + self.selection + '/'
+        if self.selectedservername == '</ dragec11':
+            self.url = 'http://178.63.156.75/BackUpImages/dragec11/' + self.selection + '/'
+        if self.selectedservername == '</ jopidane':
+            self.url = 'http://178.63.156.75/BackUpImages/jopidane/' + self.selection + '/'
         try:
             imageurl = self.url + self.data[cindex][0]
         except:
@@ -765,9 +447,263 @@ class Images(Screen):
         else:
             imagesize = self.data[cindex][3].replace('M', '').strip()
         print '1190', imageurl
-        self.session.openWithCallback(self.ListToMulticontent, SelectLocation, imageurl, imagesize)
+        self.session.openWithCallback(self.ListToMulticontent, SelectLocation, imageurl, imagesize)		
+######################
+######################
+import urllib2
+import HTMLParser
+import cStringIO
+import datetime
+import operator
 
+class HTML2Text(HTMLParser.HTMLParser):
+    """
+    extract text from HTML code
+    """
 
+    def __init__(self):
+        HTMLParser.HTMLParser.__init__(self)
+        self.output = cStringIO.StringIO()
+
+    def get_text(self):
+        """get the text output"""
+        return self.output.getvalue()
+
+    def handle_starttag(self, tag, attrs):
+        """handle  tags"""
+        if tag == 'br':
+            self.output.write('\n')
+
+    def handle_data(self, data):
+        """normal text"""
+        self.output.write(data)
+
+    def handle_endtag(self, tag):
+        if tag == 'p':
+            self.output.write('\n')
+
+def getnew(idate = None):
+    try:
+        now = datetime.datetime.now()
+        cdate = now.strftime('%Y-%b-%d')
+        d1 = datetime.datetime.strptime(idate, '%Y-%b-%d')
+        d2 = datetime.datetime.strptime(str(cdate), '%Y-%b-%d')
+        delta = d2 - d1
+        if delta.days < 32:
+            return True
+        return False
+    except:
+        return False
+
+def getdata(urlStr, searchstr = None):
+    data = []
+    try:
+        fileHandle = urllib2.urlopen(urlStr)
+        html = fileHandle.read()
+        fileHandle.close()
+    except IOError:
+        print 'Cannot open URL %s for reading' % urlStr
+        return (False, data)
+
+    try:
+        p = HTML2Text()
+        p.feed(html)
+        text = p.get_text()
+        raw_list = text.splitlines()
+    except:
+        return (False, data)
+
+    textlist = []
+    for line in raw_list:
+        line = line.strip()
+        print line
+        if searchstr:
+            if searchstr == 'New':
+                if line != '' and '.zip' in line:
+                    nfiparts = []
+                    nfiparts = line.split('.zip')
+                    url = nfiparts[0] + '.zip'
+                    spart = nfiparts[1].strip()
+                    sizdateparts = spart.split(' ')
+                    idate = sizdateparts[0]
+                    try:
+                        itime = sizdateparts[1]
+                    except:
+                        print line
+                        itime = ''
+
+                    isize = sizdateparts[len(sizdateparts) - 1]
+                    line = line + '\n'
+                    idate = idate.strip()
+                    print 'idate', idate
+                    if getnew(idate):
+                        try:
+                            imdate = datetime.datetime.strptime(idate, '%d-%b-%Y')
+                        except:
+                            imdate = None
+
+                        data.append([url,
+                         imdate,
+                         itime,
+                         isize])
+            elif line != '' and '.zip' in line and searchstr.lower() in line.lower():
+                nfiparts = []
+                nfiparts = line.split('.zip')
+                url = nfiparts[0] + '.zip'
+                spart = nfiparts[1].strip()
+                sizdateparts = spart.split(' ')
+                idate = sizdateparts[0]
+                try:
+                    itime = sizdateparts[1]
+                except:
+                    print line
+                    itime = ''
+
+                isize = sizdateparts[len(sizdateparts) - 1]
+                line = line + '\n'
+                try:
+                    imdate = datetime.datetime.strptime(idate, '%d-%b-%Y')
+                except:
+                    imdate = None
+
+                data.append([url,
+                 imdate,
+                 itime,
+                 isize])
+        elif line != '' and '.zip' in line:
+            nfiparts = []
+            nfiparts = line.split('.zip')
+            url = nfiparts[0] + '.zip'
+            spart = nfiparts[1].strip()
+            sizdateparts = spart.split(' ')
+            idate = sizdateparts[0]
+            try:
+                itime = sizdateparts[1]
+            except:
+                print line
+                itime = ''
+
+            isize = sizdateparts[len(sizdateparts) - 1]
+            line = line + '\n'
+            try:
+                imdate = datetime.datetime.strptime(idate, '%d-%b-%Y')
+            except:
+                imdate = ''
+
+            data.append([url,
+             imdate,
+             itime,
+             isize])
+
+    try:
+        data.sort(key=operator.itemgetter(1))
+    except:
+        pass
+
+    data.reverse()
+    return (True, data)
+
+def getplidata(urlStr, searchstr = None):
+    data = []
+    print ' ', urlStr
+    try:
+        fileHandle = urllib2.urlopen(urlStr)
+        html = fileHandle.read()
+        fileHandle.close()
+    except IOError:
+        print 'Cannot open URL %s for reading' % urlStr
+        return (False, data)
+
+    try:
+        p = HTML2Text()
+        p.feed(html)
+        text = p.get_text()
+        raw_list = text.splitlines()
+    except:
+        return (False, data)
+
+    data = []
+    textlist = []
+    for line in raw_list:
+        line = line.strip()
+        if searchstr:
+            if line != ' ' and '.zip' in line and searchstr.lower() in line.lower():
+                nfiparts = []
+                nfiparts = line.split('\n')
+                x = len(nfiparts)
+                if x == 1:
+                    url = nfiparts[0]
+                    idate = ''
+                    itime = ''
+                    isize = ''
+                    data.append([url,
+                     idate,
+                     itime,
+                     isize])
+                    continue
+                try:
+                    url = nfiparts[1]
+                except:
+                    url = ''
+
+                infoparts = nfiparts[0].split(' ')
+                y = len(infoparts)
+                try:
+                    idate = infoparts[0]
+                except:
+                    idate = ''
+
+                try:
+                    isize = infoparts[y - 1]
+                except:
+                    isize = ''
+
+                itime = ''
+                data.append([url,
+                 idate,
+                 itime,
+                 isize])
+        elif line != '' and '.zip' in line:
+            nfiparts = []
+            nfiparts = line.split('\t')
+            x = len(nfiparts)
+            if x == 1:
+                url = nfiparts[0]
+                idate = ''
+                itime = ''
+                isize = ''
+                data.append([url,
+                 idate,
+                 itime,
+                 isize])
+                continue
+            try:
+                url = nfiparts[1]
+            except:
+                url = ''
+
+            infoparts = nfiparts[0].split(' ')
+            y = len(infoparts)
+            try:
+                idate = infoparts[0]
+            except:
+                idate = ''
+
+            try:
+                isize = infoparts[y - 1]
+            except:
+                isize = ''
+
+            itime = ''
+            data.append([url,
+             idate,
+             itime,
+             isize])
+    print data
+    return (True, data)		
+######################
+######################		
+		
 class SelectDownloadLocation(Screen, HelpableScreen):
 
     def __init__(self, session, text = '', filename = '', currDir = None, location = None, userMode = False, minFree = None, autoAdd = False, editDir = False, inhibitDirs = [], inhibitMounts = []):
@@ -803,15 +739,12 @@ class SelectDownloadLocation(Screen, HelpableScreen):
          '/var',
          '/home',
          '/tmp',
-         '/srv',
          '/etc',
          '/share',
-         '/usr',
-         '/ba',
-         '/MB_Images']
+         '/usr']
         inhibitMounts = ['/mnt', '/ba', '/MB_Images']
         self['filelist'] = FileList(currDir, showDirectories=True, showFiles=False, inhibitMounts=inhibitMounts, inhibitDirs=inhibitDirs)
-        self['mountlist'] = MenuList(mountedDevs)
+#        self['mountlist'] = MenuList(mountedDevs)
         self['ButtonGreentext'] = Label(_('SAVE'))
         self['ButtonRedtext'] = Label(_('Exit'))
         self['target'] = Label()
@@ -960,7 +893,6 @@ class SelectDownloadLocation(Screen, HelpableScreen):
                 self.saveSelection(True)
         return
 
-
 class DownloadedFiles(Screen):
 
     def __init__(self, session):
@@ -992,20 +924,6 @@ class DownloadedFiles(Screen):
          'red': self.close,
          'cancel': self.close}, -2)
         self.fillplgfolders()
-
-    def deflatezip(self):
-        fname = self['menu'].getCurrent()
-        cindex = self['menu'].getSelectionIndex()
-        filename = self.folder + self.nfifiles[cindex][0]
-        self.path = self.folder
-        nfifile = filename.replace('.zip', '.nfi')
-        self.nfifile = nfifile
-        extractSTR = 'unzip -o ' + filename + ' -d /' + self.path
-        info = 'Extract the selected image now?'
-        instr = 'Extracting ' + filename + '\nplease wait.............................'
-        endstr = 'Press OK to exit'
-        dom = fname
-        self.session.open(Konzola, _('Exracting: %s') % dom, [extractSTR], self.fillplgfolders, False, instr, endstr)
 
     def delimage(self):
         fname = self['menu'].getCurrent()
@@ -1045,7 +963,7 @@ class DownloadedFiles(Screen):
         self.events = self.nfifiles
         if dwidth == 1280:
             self['menu'].l.setItemHeight(40)
-            self['menu'].l.setFont(0, gFont('Rale', 25))
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 25))
             for i in range(0, len(self.events)):
                 mfile = self.events[i][0]
                 msize = self.events[i][1] + 'MB'
@@ -1057,7 +975,7 @@ class DownloadedFiles(Screen):
 
         else:
             self['menu'].l.setItemHeight(45)
-            self['menu'].l.setFont(0, gFont('Rale', 35))
+            self['menu'].l.setFont(0, gFont('Sansation-Bold', 35))
             for i in range(0, len(self.events)):
                 mfile = self.events[i][0]
                 msize = self.events[i][1] + 'MB'
@@ -1069,71 +987,6 @@ class DownloadedFiles(Screen):
 
         self['menu'].l.setList(theevents)
         self['menu'].show()
-
-
-class Konzola(Screen):
-
-    def __init__(self, session, title = 'Console', cmdlist = None, finishedCallback = None, closeOnSuccess = False, instr = None, endstr = None):
-        self.session = session
-        if dwidth == 1280:
-            skin = skin_path + 'konzHD.xml'
-        else:
-            skin = skin_path + 'konzFHD.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
-        f.close()
-        self.finishedCallback = finishedCallback
-        self.closeOnSuccess = closeOnSuccess
-        self.endstr = endstr
-        instr = instr + '\n*************************************\n'
-        self['text'] = ScrollLabel(instr)
-        self['actions'] = ActionMap(['WizardActions', 'DirectionActions'], {'ok': self.cancel,
-         'back': self.cancel,
-         'up': self['text'].pageUp,
-         'down': self['text'].pageDown}, -1)
-        self.cmdlist = cmdlist
-        self.newtitle = title
-        self.onShown.append(self.updateTitle)
-        self.container = eConsoleAppContainer()
-        self.run = 0
-        self.container.appClosed.append(self.runFinished)
-        self.container.dataAvail.append(self.dataAvail)
-        self.onLayoutFinish.append(self.startRun)
-
-    def updateTitle(self):
-        self.setTitle(self.newtitle)
-
-    def startRun(self):
-        self['text'].setText(_('Execution Progress:') + '\n\n')
-        print 'Console: executing in run', self.run, ' the command:', self.cmdlist[self.run]
-        if self.container.execute(self.cmdlist[self.run]):
-            self.runFinished(-1)
-
-    def runFinished(self, retval):
-        self.run += 1
-        if self.run != len(self.cmdlist):
-            if self.container.execute(self.cmdlist[self.run]):
-                self.runFinished(-1)
-        else:
-            str = self['text'].getText()
-            str += _('Execution finished!!')
-            self['text'].setText(str)
-            self['text'].lastPage()
-            if self.finishedCallback is not None:
-                self.finishedCallback()
-            if not retval and self.closeOnSuccess:
-                self.cancel()
-        return
-
-    def cancel(self):
-        if self.run == len(self.cmdlist):
-            self.close()
-            self.container.appClosed.remove(self.runFinished)
-            self.container.dataAvail.remove(self.dataAvail)
-
-    def dataAvail(self, str):
-        self['text'].setText(self['text'].getText() + str)
-
 
 class SelectLocation(Screen):
 
@@ -1321,7 +1174,6 @@ class SelectLocation(Screen):
         if result:
             self.session.open()
 
-
 class Downloader(Screen):
 
     def __init__(self, session, url = None, target = None, path = None):
@@ -1376,6 +1228,12 @@ class Downloader(Screen):
             if self.target.endswith('.zip'):
                 info = 'The image downloaded successfully !'
                 self.session.openWithCallback(self.close, ScreenBox, _(info), type=ScreenBox.TYPE_INFO, timeout=3)
+            elif self.target.endswith('.tar.xz'):
+                info = 'The image downloaded successfully !'
+                self.session.openWithCallback(self.close, ScreenBox, _(info), type=ScreenBox.TYPE_INFO, timeout=3)
+            elif self.target.endswith('.nfi'):
+                info = 'The image downloaded successfully !'
+                self.session.openWithCallback(self.close, ScreenBox, _(info), type=ScreenBox.TYPE_INFO, timeout=3)				
             else:
                 self.close
                 return
@@ -1406,164 +1264,4 @@ class Downloader(Screen):
 
     def exit(self, result = None):
         self.close()
-
-
-class ScreenBox(Screen):
-    TYPE_YESNO = 0
-    TYPE_INFO = 1
-    TYPE_WARNING = 2
-    TYPE_ERROR = 3
-    TYPE_MESSAGE = 4
-
-    def __init__(self, session, text, type = TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None, picon = None, simple = False, list = [], timeout_default = None):
-        self.type = type
-        self.session = session
-        if dwidth == 1280:
-            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/sboxHD.xml'
-        else:
-            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/sboxFHD.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
-        f.close()
-        Screen.__init__(self, session)
-        self.msgBoxID = msgBoxID
-        self['text'] = Label(text)
-        self['Text'] = StaticText(text)
-        self['selectedChoice'] = StaticText()
-        self.text = text
-        self.close_on_any_key = close_on_any_key
-        self.timeout_default = timeout_default
-        self['ErrorPixmap'] = Pixmap()
-        self['QuestionPixmap'] = Pixmap()
-        self['InfoPixmap'] = Pixmap()
-        self['WarningPixmap'] = Pixmap()
-        self.timerRunning = False
-        self.initTimeout(timeout)
-        picon = picon or type
-        if picon != self.TYPE_ERROR:
-            self['ErrorPixmap'].hide()
-        if picon != self.TYPE_YESNO:
-            self['QuestionPixmap'].hide()
-        if picon != self.TYPE_INFO:
-            self['InfoPixmap'].hide()
-        if picon != self.TYPE_WARNING:
-            self['WarningPixmap'].hide()
-        self.title = self.type < self.TYPE_MESSAGE and [_('Question'),
-         _('Information'),
-         _('Warning'),
-         _('Error')][self.type] or _('Message')
-        if type == self.TYPE_YESNO:
-            if list:
-                self.list = list
-            elif default == True:
-                self.list = [(_('Yes'), True), (_('No'), False)]
-            else:
-                self.list = [(_('No'), False), (_('Yes'), True)]
-        else:
-            self.list = []
-        self['list'] = MenuList(self.list)
-        if self.list:
-            self['selectedChoice'].setText(self.list[0][0])
-        else:
-            self['list'].hide()
-        if enable_input:
-            self['actions'] = ActionMap(['MsgBoxActions', 'DirectionActions'], {'cancel': self.cancel,
-             'ok': self.ok,
-             'alwaysOK': self.alwaysOK,
-             'up': self.up,
-             'down': self.down,
-             'left': self.left,
-             'right': self.right,
-             'upRepeated': self.up,
-             'downRepeated': self.down,
-             'leftRepeated': self.left,
-             'rightRepeated': self.right}, -1)
-        self.onLayoutFinish.append(self.layoutFinished)
-
-    def layoutFinished(self):
-        self.setTitle(self.title)
-
-    def initTimeout(self, timeout):
-        self.timeout = timeout
-        if timeout > 0:
-            self.timer = eTimer()
-            self.timer.callback.append(self.timerTick)
-            self.onExecBegin.append(self.startTimer)
-            self.origTitle = None
-            if self.execing:
-                self.timerTick()
-            else:
-                self.onShown.append(self.__onShown)
-            self.timerRunning = True
-        else:
-            self.timerRunning = False
-        return
-
-    def __onShown(self):
-        self.onShown.remove(self.__onShown)
-        self.timerTick()
-
-    def startTimer(self):
-        self.timer.start(1000)
-
-    def stopTimer(self):
-        if self.timerRunning:
-            del self.timer
-            self.onExecBegin.remove(self.startTimer)
-            self.setTitle(self.origTitle)
-            self.timerRunning = False
-
-    def timerTick(self):
-        if self.execing:
-            self.timeout -= 1
-            if self.origTitle is None:
-                self.origTitle = self.instance.getTitle()
-            self.setTitle(self.origTitle + ' (' + str(self.timeout) + ')')
-            if self.timeout == 0:
-                self.timer.stop()
-                self.timerRunning = False
-                self.timeoutCallback()
-        return
-
-    def timeoutCallback(self):
-        print 'Timeout!'
-        if self.timeout_default is not None:
-            self.close(self.timeout_default)
-        else:
-            self.ok()
-        return
-
-    def cancel(self):
-        self.close(False)
-
-    def ok(self):
-        if self.list:
-            self.close(self['list'].getCurrent()[1])
-        else:
-            self.close(True)
-
-    def alwaysOK(self):
-        self.close(True)
-
-    def up(self):
-        self.move(self['list'].instance.moveUp)
-
-    def down(self):
-        self.move(self['list'].instance.moveDown)
-
-    def left(self):
-        self.move(self['list'].instance.pageUp)
-
-    def right(self):
-        self.move(self['list'].instance.pageDown)
-
-    def move(self, direction):
-        if self.close_on_any_key:
-            self.close(True)
-        self['list'].instance.moveSelection(direction)
-        if self.list:
-            self['selectedChoice'].setText(self['list'].getCurrent()[0])
-        self.stopTimer()
-
-    def __repr__(self):
-        return str(type(self)) + '(' + self.text + ')'
+		

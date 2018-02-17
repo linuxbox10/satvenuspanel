@@ -1,6 +1,5 @@
 	<screen name="Menu" position="center,center" size="1920,1080" flags="wfNoBorder"  backgroundColor="#40000000">
-    <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />	
-	
+    <ePixmap position="0,0" size="1920,1080" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/hrbet2fhd.png" alphatest="blend" transparent="1" />		
 <widget source="list" render="Listbox" selectionPixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/slider.png" position="210,180" size="1100,750" backgroundColorSelected="#40000000" foregroundColor="#bfff00" foregroundColorSelected="#cc0000" scrollbarMode="showNever" transparent="1" >
 <convert type="TemplatedMultiContent">
 {"template": [
@@ -12,7 +11,6 @@ MultiContentEntryText(pos = (810, 0), size = (150, 50), font=0, flags = RT_HALIG
 }
 </convert>
 </widget>
-	<eLabel text="Select to install ..." position="245,1005" size="1280,130" noWrap="1" transparent="1" font="Rale;36" foregroundColor="#ffffff" />	
 <widget source="global.CurrentTime" render="Label" position="205,32" size="500,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;33" halign="left">
 <convert type="ClockToText">Format:%A, %d.%m.%Y</convert>
 </widget>

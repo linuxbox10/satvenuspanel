@@ -4,7 +4,7 @@
     <widget name="ErrorPixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/input_error.png" position="140,60" size="53,53" transparent="1" alphatest="blend" zPosition="2"/>
 	<widget name="QuestionPixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/input_question.png" position="140,60" size="53,53" transparent="1" alphatest="blend" zPosition="2"/>
 	<widget name="InfoPixmap" pixmap="/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/pics/input_info.png" position="140,60" size="53,53" transparent="1" alphatest="blend" zPosition="2"/>
-    <widget name="list" position="140,350" size="100,720" transparent="1" zPosition="2" backgroundColorSelected="#40000000" foregroundColor="#fff700" foregroundColorSelected="#cc0000" />
+    <widget name="list" position="140,350" itemHeight="32" scrollbarMode="showNever" size="100,720" transparent="1" zPosition="2" backgroundColorSelected="#40000000" foregroundColor="#fff700" foregroundColorSelected="#cc0000" />
 	<applet type="onLayoutFinish">	
 	</applet>
 <widget source="global.CurrentTime" render="Label" position="150,20" size="400,35" foregroundColor="#ffffff" transparent="1" zPosition="1" font="Rale;23" halign="left">

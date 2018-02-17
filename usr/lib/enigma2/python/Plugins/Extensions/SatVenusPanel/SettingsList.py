@@ -13,6 +13,7 @@ from Components.Pixmap import Pixmap
 from Tools.Directories import SCOPE_SKIN_IMAGE, resolveFilename
 from enigma import eTimer, getDesktop
 from Screens.MessageBox import MessageBox
+from image_viewer import ScreenBox
 import os
 import sys
 import httplib
@@ -44,10 +45,10 @@ class SettingsList(Screen):
             self.drawList.append(self.buildListEntry(entry[0], entry[1]))
 
         self['list'] = List(self.drawList)
-        self['key_red'] = Button(_('Download'))
-        self['key_green'] = Button('')
-        self['key_yellow'] = Button('')
-        self['key_blue'] = Button(_('Back'))
+#        self['key_red'] = Button(_('Download'))
+#        self['key_green'] = Button('')
+#        self['key_yellow'] = Button('')
+#        self['key_blue'] = Button(_('Back'))
         self['actions'] = ActionMap(['OkCancelActions', 'ColorActions'], {'ok': self.ok,
          'red': self.ok,
          'blue': self.quit,
@@ -95,7 +96,7 @@ class SettingsList(Screen):
         except Exception as e:
             print e
 
-        self.session.open(ScreenBox, _('Settings installed'), type=ScreenBox.TYPE_INFO, timeout=2)
+        self.session.open(ScreenBox, _('Settings installed'), type=ScreenBox.TYPE_INFO, timeout=4)
 
     def ok(self):
         if len(self.list) == 0:
@@ -439,7 +440,10 @@ class ActionBox(Screen):
         self['message'] = Label(message)
         self['logo'] = Pixmap()
         self.timer = eTimer()
-        self.timer.callback.append(self.__setTitle)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.__setTitle)
+        except:
+            self.timer.callback.append(self.__setTitle)
         self.timer.start(200, 1)
 
     def __setTitle(self):
@@ -447,163 +451,13 @@ class ActionBox(Screen):
             self['logo'].instance.setPixmapFromFile(os.path.dirname(sys.modules[__name__].__file__) + '/images/run.png')
         self.setTitle(self.ctitle)
         self.timer = eTimer()
-        self.timer.callback.append(self.__start)
+        try:
+            self.timer_conn = self.timer.timeout.connect(self.__start)
+        except:
+            self.timer.callback.append(self.__start)
         self.timer.start(200, 1)
         return
 
     def __start(self):
         self.close(self.caction())
 
-
-class ScreenBox(Screen):
-    TYPE_YESNO = 0
-    TYPE_INFO = 1
-    TYPE_WARNING = 2
-    TYPE_ERROR = 3
-    TYPE_MESSAGE = 4
-
-    def __init__(self, session, text, type = TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None, picon = None, simple = False, list = [], timeout_default = None):
-        self.type = type
-        self.session = session
-        if dwidth == 1280:
-            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/sboxHD.xml'
-        else:
-            skin = '/usr/lib/enigma2/python/Plugins/Extensions/SatVenusPanel/Skin/sboxFHD.xml'
-        f = open(skin, 'r')
-        self.skin = f.read()
-        f.close()
-        Screen.__init__(self, session)
-        self.msgBoxID = msgBoxID
-        self['text'] = Label(text)
-        self.text = text
-        self.close_on_any_key = close_on_any_key
-        self.timeout_default = timeout_default
-        self['ErrorPixmap'] = Pixmap()
-        self['QuestionPixmap'] = Pixmap()
-        self['InfoPixmap'] = Pixmap()
-        self['WarningPixmap'] = Pixmap()
-        self.timerRunning = False
-        self.initTimeout(timeout)
-        picon = picon or type
-        if picon != self.TYPE_ERROR:
-            self['ErrorPixmap'].hide()
-        if picon != self.TYPE_YESNO:
-            self['QuestionPixmap'].hide()
-        if picon != self.TYPE_INFO:
-            self['InfoPixmap'].hide()
-        if picon != self.TYPE_WARNING:
-            self['WarningPixmap'].hide()
-        self.title = self.type < self.TYPE_MESSAGE and [_('Question'),
-         _('Information'),
-         _('Warning'),
-         _('Error')][self.type] or _('Message')
-        if type == self.TYPE_YESNO:
-            if list:
-                self.list = list
-            elif default == True:
-                self.list = [(_('Yes'), True), (_('No'), False)]
-            else:
-                self.list = [(_('No'), False), (_('Yes'), True)]
-        else:
-            self.list = []
-        if enable_input:
-            self['actions'] = ActionMap(['MsgBoxActions', 'DirectionActions'], {'cancel': self.cancel,
-             'ok': self.ok,
-             'alwaysOK': self.alwaysOK,
-             'up': self.up,
-             'down': self.down,
-             'left': self.left,
-             'right': self.right,
-             'upRepeated': self.up,
-             'downRepeated': self.down,
-             'leftRepeated': self.left,
-             'rightRepeated': self.right}, -1)
-        self.onLayoutFinish.append(self.layoutFinished)
-
-    def layoutFinished(self):
-        self.setTitle(self.title)
-
-    def initTimeout(self, timeout):
-        self.timeout = timeout
-        if timeout > 0:
-            self.timer = eTimer()
-            self.timer.callback.append(self.timerTick)
-            self.onExecBegin.append(self.startTimer)
-            self.origTitle = None
-            if self.execing:
-                self.timerTick()
-            else:
-                self.onShown.append(self.__onShown)
-            self.timerRunning = True
-        else:
-            self.timerRunning = False
-        return
-
-    def __onShown(self):
-        self.onShown.remove(self.__onShown)
-        self.timerTick()
-
-    def startTimer(self):
-        self.timer.start(1000)
-
-    def stopTimer(self):
-        if self.timerRunning:
-            del self.timer
-            self.onExecBegin.remove(self.startTimer)
-            self.setTitle(self.origTitle)
-            self.timerRunning = False
-
-    def timerTick(self):
-        if self.execing:
-            self.timeout -= 1
-            if self.origTitle is None:
-                self.origTitle = self.instance.getTitle()
-            self.setTitle(self.origTitle + ' (' + str(self.timeout) + ')')
-            if self.timeout == 0:
-                self.timer.stop()
-                self.timerRunning = False
-                self.timeoutCallback()
-        return
-
-    def timeoutCallback(self):
-        print 'Timeout!'
-        if self.timeout_default is not None:
-            self.close(self.timeout_default)
-        else:
-            self.ok()
-        return
-
-    def cancel(self):
-        self.close(False)
-
-    def ok(self):
-        if self.list:
-            self.close(self['list'].getCurrent()[1])
-        else:
-            self.close(True)
-
-    def alwaysOK(self):
-        self.close(True)
-
-    def up(self):
-        self.move(self['list'].instance.moveUp)
-
-    def down(self):
-        self.move(self['list'].instance.moveDown)
-
-    def left(self):
-        self.move(self['list'].instance.pageUp)
-
-    def right(self):
-        self.move(self['list'].instance.pageDown)
-
-    def move(self, direction):
-        if self.close_on_any_key:
-            self.close(True)
-        self['list'].instance.moveSelection(direction)
-        if self.list:
-            self['selectedChoice'].setText(self['list'].getCurrent()[0])
-        self.stopTimer()
-
-    def __repr__(self):
-        return str(type(self)) + '(' + self.text + ')'
